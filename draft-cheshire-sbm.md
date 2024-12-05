@@ -8,19 +8,19 @@ submissiontype: independent
 number:
 date:
 v: 3
-area: WIT
-workgroup: TSVWG Transport and Services Working Group
+# area: WIT
+# workgroup: TSVWG Transport and Services Working Group
 keyword:
  - Bufferbloat
  - Latency
  - Responsiveness
 venue:
-  group: WG
-  type: Working Group
-  mail: WG@example.com
-  arch: https://example.com/WG
-  github: StuartCheshire/draft-cheshire-sbm
-  latest: https://example.com/LATEST
+#  group: WG
+#  type: Working Group
+#  mail: WG@example.com
+#  arch: https://example.com/WG
+  github: "StuartCheshire/draft-cheshire-sbm"
+  latest: "https://StuartCheshire.github.io/draft-cheshire-sbm/draft-cheshire-sbm.html"
 
 author:
  -
