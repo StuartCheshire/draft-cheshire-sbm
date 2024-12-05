@@ -3,7 +3,7 @@
 
 
 Network Working Group                                        S. Cheshire
-Internet-Draft                                                     Apple
+Internet-Draft                                                Apple Inc.
 Intended status: Informational                           5 December 2024
 Expires: 8 June 2025
 
@@ -13,15 +13,23 @@ Expires: 8 June 2025
 
 Abstract
 
-   TODO Abstract
+   In the past decade there has been growing awareness about the harmful
+   effects of bufferbloat in the network, and there has been good work
+   on developments like L4S to address that problem.  However,
+   bufferbloat on the sender itself remains a significant additional
+   problem, which has not received similar attention.  This document
+   offers techniques and guidance for host networking software to avoid
+   unnecessary delays for network traffic caused by excessive buffering
+   at the sender, which are broadly applicable across all datagram and
+   transport protocols (UDP, TCP, QUIC, etc.) on all operating systems.
 
 About This Document
 
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://StuartCheshire.github.io/draft-cheshire-sbm/draft-cheshire-
-   sbm.html.  Status information for this document may be found at
+   <https://StuartCheshire.github.io/draft-cheshire-sbm/draft-cheshire-
+   sbm.html>.  Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-cheshire/.
 
    Source for this draft and an issue tracker can be found at
@@ -57,19 +65,14 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction
-   2.  Conventions and Definitions
-   3.  Security Considerations
-   4.  IANA Considerations
-   5.  Normative References
+   1.  Conventions and Definitions
+   2.  Security Considerations
+   3.  IANA Considerations
+   4.  Normative References
    Acknowledgments
    Author's Address
 
-1.  Introduction
-
-   TODO Introduction
-
-2.  Conventions and Definitions
+1.  Conventions and Definitions
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -77,15 +80,16 @@ Table of Contents
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-3.  Security Considerations
+2.  Security Considerations
 
-   TODO Security
+   No security concerns are anticipated resulting from reducing the
+   amount of stale data sitting in buffers at the sender.
 
-4.  IANA Considerations
+3.  IANA Considerations
 
    This document has no IANA actions.
 
-5.  Normative References
+4.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -103,5 +107,5 @@ Acknowledgments
 Author's Address
 
    Stuart Cheshire
-   Apple
+   Apple Inc.
    Email: cheshire@apple.com
