@@ -20,12 +20,12 @@ venue:
 #  mail: WG@example.com
 #  arch: https://example.com/WG
   github: "StuartCheshire/draft-cheshire-sbm"
-  latest: "https://StuartCheshire.github.io/draft-cheshire-sbm/draft-cheshire-sbm.html"
+  latest: "&lt;https://StuartCheshire.github.io/draft-cheshire-sbm/draft-cheshire-sbm.html&gt;"
 
 author:
  -
     fullname: Stuart Cheshire
-    organization: Apple
+    organization: Apple Inc.
     email: cheshire@apple.com
 
 normative:
@@ -34,13 +34,19 @@ informative:
 
 --- abstract
 
-TODO Abstract
+In the past decade there has been growing awareness about the
+harmful effects of bufferbloat in the network, and there has been
+good work on developments like L4S to address that problem.
+However, bufferbloat on the sender itself remains a significant
+additional problem, which has not received similar attention.
+This document offers techniques and guidance
+for host networking software to avoid unnecessary delays
+for network traffic caused by excessive buffering at the sender,
+which are broadly applicable across
+all datagram and transport protocols (UDP, TCP, QUIC, etc.)
+on all operating systems.
 
 --- middle
-
-# Introduction
-
-TODO Introduction
 
 # Conventions and Definitions
 
@@ -48,7 +54,8 @@ TODO Introduction
 
 # Security Considerations
 
-TODO Security
+No security concerns are anticipated resulting from reducing
+the amount of stale data sitting in buffers at the sender.
 
 # IANA Considerations
 
