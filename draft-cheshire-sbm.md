@@ -7,7 +7,6 @@ docname: draft-cheshire-sbm
 submissiontype: independent
 number:
 date:
-consensus: true
 v: 3
 area: WIT
 workgroup: TSVWG Transport and Services Working Group
