@@ -162,20 +162,20 @@ Table of Contents
 
    It is informative to observe a comparison with graphics cards.  Most
    graphics cards support double-buffering.  This allows one frame to be
-   displayed while the CPU and GPU work on generating the next frame.
-   This concurrency allows for greater efficiency, by enabling two
-   actions to be happening at the same time.  But quintuple-buffering is
-   not better than double-buffering.  Having a pipeline five frames
-   deep, or ten frames, or fifty frames, is not better than two frames.
-   For a fast-paced video game, having a display pipeline fifty frames
-   deep, where every frame is generated, then waits in the pipeline, and
-   then is displayed fifty frames later, would not improve performance
-   or efficiency, but would cause an unacceptable delay between a player
-   action and seeing the results of that action on the screen.  It is
-   beneficial for the video game to work on preparing the next frame
-   while the previous frame is being displayed, but it is not beneficial
-   for the video game to get multiple frames ahead of the frame
-   currently being displayed.
+   displayed while the CPU and GPU are working on generating the next
+   frame.  This concurrency allows for greater efficiency, by enabling
+   two actions to be happening at the same time.  But quintuple-
+   buffering is not better than double-buffering.  Having a pipeline
+   five frames deep, or ten frames, or fifty frames, is not better than
+   two frames.  For a fast-paced video game, having a display pipeline
+   fifty frames deep, where every frame is generated, then waits in the
+   pipeline, and then is displayed fifty frames later, would not improve
+   performance or efficiency, but would cause an unacceptable delay
+   between a player action and seeing the results of that action on the
+   screen.  It is beneficial for the video game to work on preparing the
+   next frame while the previous frame is being displayed, but it is not
+   beneficial for the video game to get multiple frames ahead of the
+   frame currently being displayed.
 
    Another reason that it is good not to permit an excessive amount of
    unsent data to be queued up is that once data is committed to a
@@ -241,7 +241,7 @@ Table of Contents
    the queue state information back to the sender does not add
    significant delay.
 
-   Packet size constraints, particularly scarse bits available in the IP
+   Packet size constraints, particularly scarce bits available in the IP
    header, mean that for pragmatic reasons the ECN queue size feedback
    is limited to two states: “The source may try sending a little faster
    if desired,” and, “The source should reduce its sending rate.” Use of
@@ -255,7 +255,7 @@ Table of Contents
    eventually result in the sending application being throttled via
    having a write call blocked, returning an EWOULDBLOCK error, or
    exerting some other form of backpressure that causes the source
-   application to temporarily cease sending new data.
+   application to temporarily pause sending new data.
 
 6.  Case Study -- TCP_NOTSENT_LOWAT
 
@@ -278,7 +278,7 @@ Table of Contents
    the socket send buffer before it even left the source machine.
    Clearly, delaying every sent byte by two seconds resulted in a very
    sluggishness screen sharing experience, and it did not yield any
-   other benefit like higher throughput or lower CPU utilization.
+   useful benefit like higher throughput or lower CPU utilization.
 
    This lead to the creation in May 2011 of a new socket option on Mac
    OS and iOS called “TCP_NOTSENT_LOWAT”. This new socket option
@@ -352,26 +352,27 @@ Table of Contents
    (e.g., Gb/s and above) 16 kilobytes of unsent data could be consumed
    very quickly, leaving the sending application insufficient time to
    generate its next logical block of data before the unsent backlog ran
-   out.  It became clear that it would be more useful for the sending
-   application specify how much advance notice of data exhaustion it
-   required (in milliseconds, or microseconds), depending on how much
-   time the application anticipated needing to generate its next logical
-   block of data.  The application could perform this calculation
-   itself, calculating the estimated current data rate and dividing that
-   by its desired advance notice time, to compute the number of
-   outstanding unsent bytes corresponding to that desired time.
-   However, the application would have to keep adjusting its
-   TCP_NOTSENT_LOWAT value as the observed data rate changed.  Since the
-   transport protocol already knows the number of unacknowledged bytes
-   in flight, and the current round-trip delay, the transport protocol
-   is in a better position to perform this calculation.  The transport
-   protocol also knows if features like hardware offload and stretch
-   acks are being used, which could impact the burstiness of consumption
-   of unsent bytes.  If stretch acks are being used, and a couple of
-   acks arrive acknowledging 12 kilobytes each, then a 16 kilobyte
-   unsent backlog could be consumed almost instantly.  Therefore it is
-   better to have the transport protocol use all the information it has
-   available to estimate when it expects to run out of unsent data.
+   out and available network capacity was left unused.  It became clear
+   that it would be more useful for the sending application specify how
+   much advance notice of data exhaustion it required (in milliseconds,
+   or microseconds), depending on how much time the application
+   anticipated needing to generate its next logical block of data.  The
+   application could perform this calculation itself, calculating the
+   estimated current data rate and dividing that by its desired advance
+   notice time, to compute the number of outstanding unsent bytes
+   corresponding to that desired time.  However, the application would
+   have to keep adjusting its TCP_NOTSENT_LOWAT value as the observed
+   data rate changed.  Since the transport protocol already knows the
+   number of unacknowledged bytes in flight, and the current round-trip
+   delay, the transport protocol is in a better position to perform this
+   calculation.  The transport protocol also knows if features like
+   hardware offload and stretch acks are being used, which could impact
+   the burstiness of consumption of unsent bytes.  If stretch acks are
+   being used, and a couple of acks arrive acknowledging 12 kilobytes
+   each, then a 16 kilobyte unsent backlog could be consumed almost
+   instantly.  Therefore it is better to have the transport protocol use
+   all the information it has available to estimate when it expects to
+   run out of unsent data.
 
 7.3.  Other Transport Protocols
 
@@ -430,7 +431,7 @@ Table of Contents
    Relying on indirect backpressure by discarding or marking a packet in
    the sending device itself is a crude rate-control signal, because it
    takes a full network round-trip time before the effect of that drop
-   or mark is observed at the receiver, is echoed back to the sender,
+   or mark is observed at the receiver and echoed back to the sender,
    and it may take multiple such round trips before it finally results
    in an appropriate reduction in sending rate.
 
