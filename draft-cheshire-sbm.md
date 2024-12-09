@@ -213,7 +213,7 @@ on balance it is simpler simply to avoid committing
 too much unsent data to the buffer in the first place.
 If the backlog of unsent data is kept reasonably low,
 that gives the source more flexibility decide what to
-put into the buffer next, when that opportunity arrises.
+put into the buffer next, when that opportunity arises.
 
 # Indirect Backpressure
 
@@ -562,10 +562,15 @@ the benefits of not overcommitting data to the outgoing buffer are similar.
 
 The goal is for the application software to be able to
 write chunks of data large enough to be efficient,
-but not so large that the application overcommits data
-to the outgoing queue long before it will actually be sent,
+without writing too many of them too quickly.
+This avoids the unfortunate situation where a delay-sensitive
+application inadvertently writes many blocks of data
+long before they will actually depart the source machine,
 such that by the time the enqueued data is actually sent,
 the application may have newer data that it would rather send instead.
+By deferring generating data until the networking code is
+actually ready to send it, the application retains more precise
+control over what data will be sent when the opportunity arises.
 
 # Security Considerations
 
