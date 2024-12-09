@@ -4,8 +4,8 @@
 
 Network Working Group                                        S. Cheshire
 Internet-Draft                                                Apple Inc.
-Intended status: Informational                           7 December 2024
-Expires: 10 June 2025
+Intended status: Informational                           9 December 2024
+Expires: 12 June 2025
 
 
                         Source Buffer Management
@@ -50,7 +50,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 10 June 2025.
+   This Internet-Draft will expire on 12 June 2025.
 
 Copyright Notice
 
@@ -187,7 +187,7 @@ Table of Contents
    avoid committing too much unsent data to the buffer in the first
    place.  If the backlog of unsent data is kept reasonably low, that
    gives the source more flexibility decide what to put into the buffer
-   next, when that opportunity arrises.
+   next, when that opportunity arises.
 
 5.  Indirect Backpressure
 
@@ -485,11 +485,15 @@ Table of Contents
    outgoing buffer are similar.
 
    The goal is for the application software to be able to write chunks
-   of data large enough to be efficient, but not so large that the
-   application overcommits data to the outgoing queue long before it
-   will actually be sent, such that by the time the enqueued data is
-   actually sent, the application may have newer data that it would
-   rather send instead.
+   of data large enough to be efficient, without writing too many of
+   them too quickly.  This avoids the unfortunate situation where a
+   delay-sensitive application inadvertently writes many blocks of data
+   long before they will actually depart the source machine, such that
+   by the time the enqueued data is actually sent, the application may
+   have newer data that it would rather send instead.  By deferring
+   generating data until the networking code is actually ready to send
+   it, the application retains more precise control over what data will
+   be sent when the opportunity arises.
 
 10.  Security Considerations
 
