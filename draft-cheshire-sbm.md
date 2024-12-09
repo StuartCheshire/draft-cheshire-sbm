@@ -183,7 +183,7 @@ action to write its data again at a later time).
 It is informative to observe a comparison with graphics cards.
 Most graphics cards support double-buffering.
 This allows one frame to be displayed while
-the CPU and GPU work on generating the next frame.
+the CPU and GPU are working on generating the next frame.
 This concurrency allows for greater efficiency,
 by enabling two actions to be happening at the same time.
 But quintuple-buffering is not better than double-buffering.
@@ -273,7 +273,7 @@ the queue is building up (the Wi-Fi Access Point) is very close
 to the receiver, and having the receiver echo the queue state
 information back to the sender does not add significant delay.
 
-Packet size constraints, particularly scarse bits available
+Packet size constraints, particularly scarce bits available
 in the IP header, mean that for pragmatic reasons the ECN
 queue size feedback is limited to two states: “The source
 may try sending a little faster if desired,” and, “The
@@ -291,7 +291,7 @@ via having a write call blocked,
 returning an EWOULDBLOCK error,
 or exerting some other form of backpressure that
 causes the source application
-to temporarily cease sending new data.
+to temporarily pause sending new data.
 
 # Case Study -- TCP\_NOTSENT\_LOWAT
 
@@ -318,7 +318,7 @@ spent two seconds sitting in the socket send buffer
 before it even left the source machine.
 Clearly, delaying every sent byte by two seconds
 resulted in a very sluggishness screen sharing experience,
-and it did not yield any other benefit like
+and it did not yield any useful benefit like
 higher throughput or lower CPU utilization.
 
 This lead to the creation in May 2011
@@ -412,7 +412,8 @@ On high-rate paths (e.g., Gb/s and above)
 16 kilobytes of unsent data could be consumed
 very quickly, leaving the sending application
 insufficient time to generate its next logical block of data
-before the unsent backlog ran out.
+before the unsent backlog ran out
+and available network capacity was left unused.
 It became clear that it would be more useful for the
 sending application specify how much advance notice
 of data exhaustion it required (in milliseconds, or microseconds),
@@ -503,7 +504,7 @@ Relying on indirect backpressure by
 discarding or marking a packet in the sending device itself
 is a crude rate-control signal, because it takes a full network
 round-trip time before the effect of that drop or mark is
-observed at the receiver, is echoed back to the sender, and
+observed at the receiver and echoed back to the sender, and
 it may take multiple such round trips before it finally
 results in an appropriate reduction in sending rate.
 
