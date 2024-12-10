@@ -4,8 +4,8 @@
 
 Network Working Group                                        S. Cheshire
 Internet-Draft                                                Apple Inc.
-Intended status: Informational                           9 December 2024
-Expires: 12 June 2025
+Intended status: Informational                          10 December 2024
+Expires: 13 June 2025
 
 
                         Source Buffer Management
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 June 2025.
+   This Internet-Draft will expire on 13 June 2025.
 
 Copyright Notice
 
@@ -112,11 +112,12 @@ Table of Contents
    been taken so far to address the problem, shortcomings with those
    existing solutions, and new mechanisms that work better.
 
-   To explain the problem and the solution, this document begins with a
-   discussion of source buffering and why it is useful.  This document
-   explains the need for backpressure on senders that are able to exceed
-   the network capacity, and separates backpressure mechanisms into
-   direct backpressure and indirect backpressure.
+   To explain the problem and the solution, this document begins with
+   some historical background about why computers have buffers in the
+   first place, and why buffers are useful.  This document explains the
+   need for backpressure on senders that are able to exceed the network
+   capacity, and separates backpressure mechanisms into direct
+   backpressure and indirect backpressure.
 
    The document concludes by describing the TCP_REPLENISH_TIME socket
    option, and its equivalent for other networking APIs.
@@ -286,19 +287,19 @@ Table of Contents
    provided the ability for application software (like the VNC RFB
    server) to specify a low-water mark threshold for the minimum amount
    of *unsent* data it would like to have waiting in the socket send
-   buffer.  Instead of filling the socket send buffer to its maximum
-   capacity, the socket send buffer would hold just the data that had
-   been sent but not yet acknowledged (enough to keep the bandwidth-
-   delay product of the network path full and fully utilize the capacity
-   of the path) plus some *small* amount of additional unsent data
-   waiting to go out.  Some *small* amount of unsent data waiting to go
-   out is beneficial, so that the network stack has data ready to send
-   when the opportunity arises (e.g., a TCP ACK arrives signalling that
-   previous data has now been delivered).  Too much unsent data waiting
-   to go out -- in excess of what the network stack might soon be able
-   to send -- is harmful for delay-sensitive applications because it
-   increases delay without meaningfully increasing throughput or
-   utilization.
+   buffer.  Instead of encouraging the application to fill the socket
+   send buffer to its maximum capacity, the socket send buffer would
+   hold just the data that had been sent but not yet acknowledged
+   (enough to fully occupy the bandwidth-delay product of the network
+   path and fully utilize the available capacity) plus some *small*
+   amount of additional unsent data waiting to go out.  Some *small*
+   amount of unsent data waiting to go out is beneficial, so that the
+   network stack has data ready to send when the opportunity arises
+   (e.g., a TCP ACK arrives signalling that previous data has now been
+   delivered).  Too much unsent data waiting to go out -- in excess of
+   what the network stack might soon be able to send -- is harmful for
+   delay-sensitive applications because it increases delay without
+   meaningfully increasing throughput or utilization.
 
    Empirically it was found that setting an unsent data low-water mark
    threshold of 16 kilobytes worked well for VNC RFB screen sharing.
@@ -307,13 +308,13 @@ Table of Contents
    application to begin work on preparing the next frame to send.  Once
    the VNC RFB screen sharing application had prepared the next frame
    and written it to the socket send buffer, it would again call
-   kevent() to block and wait to be notified that it is time to begin
-   work on the following frame.  This allows the VNC RFB screen sharing
-   server to stay just one frame ahead of the frame currently being sent
-   over the network, and not inadvertently get multiple frames ahead.
-   This provided enough unsent data waiting to go out to fully utilize
-   the capacity of the path, without buffering so much unsent data that
-   it adversely affected usability.
+   kevent() to block and wait to be notified when it became time to
+   begin work on the following frame.  This allows the VNC RFB screen
+   sharing server to stay just one frame ahead of the frame currently
+   being sent over the network, and not inadvertently get multiple
+   frames ahead.  This provided enough unsent data waiting to go out to
+   fully utilize the capacity of the path, without buffering so much
+   unsent data that it adversely affected usability.
 
    A demo showing the benefits of using TCP_NOTSENT_LOWAT with VNC RFB
    screen sharing was shown at the Apple Worldwide Developer Conference
