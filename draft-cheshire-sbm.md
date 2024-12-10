@@ -118,8 +118,9 @@ shortcomings with those existing solutions,
 and new mechanisms that work better.
 
 To explain the problem and the solution,
-this document begins with a discussion of
-source buffering and why it is useful.
+this document begins with some historical background
+about why computers have buffers in the first place,
+and why buffers are useful.
 This document explains the need for backpressure on
 senders that are able to exceed the network capacity,
 and separates backpressure mechanisms into
@@ -329,11 +330,12 @@ application software (like the VNC RFB server)
 to specify a low-water mark threshold for the
 minimum amount of **unsent** data it would like
 to have waiting in the socket send buffer.
-Instead of filling the socket send buffer to its maximum capacity,
+Instead of encouraging the application to
+fill the socket send buffer to its maximum capacity,
 the socket send buffer would hold just the data
 that had been sent but not yet acknowledged
-(enough to keep the bandwidth-delay product of the network path
-full and fully utilize the capacity of the path)
+(enough to fully occupy the bandwidth-delay product
+of the network path and fully utilize the available capacity)
 plus some **small** amount of additional unsent data waiting to go out.
 Some **small** amount of unsent data waiting to go out is
 beneficial, so that the network stack has data
@@ -358,7 +360,7 @@ Once the VNC RFB screen sharing application
 had prepared the next frame and written it
 to the socket send buffer,
 it would again call kevent() to block and wait
-to be notified that it is time to begin work
+to be notified when it became time to begin work
 on the following frame.
 This allows the VNC RFB screen sharing server
 to stay just one frame ahead of
