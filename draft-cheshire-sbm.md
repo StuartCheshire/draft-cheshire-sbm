@@ -3,10 +3,10 @@ title: "Source Buffer Management"
 abbrev: "Source Buffer Management"
 category: info
 
-docname: draft-cheshire-sbm
+docname: draft-cheshire-sbm-00
 submissiontype: independent
 number:
-date:
+date: 2024-12-09
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
