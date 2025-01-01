@@ -3,10 +3,10 @@ title: "Source Buffer Management"
 abbrev: "Source Buffer Management"
 category: info
 
-docname: draft-cheshire-sbm-00
+docname: draft-cheshire-sbm-01
 submissiontype: independent
 number:
-date: 2024-12-09
+date: 2025-01-01
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
@@ -127,8 +127,9 @@ and separates backpressure mechanisms into
 direct backpressure and indirect backpressure.
 
 The document concludes by describing
-the TCP\_REPLENISH\_TIME socket option,
-and its equivalent for other networking APIs.
+the TCP\_REPLENISH\_TIME socket option
+for TCP connections using BSD Sockets,
+and its equivalent for other networking protocols and APIs.
 
 # Source Buffering
 
@@ -141,17 +142,17 @@ to an RS232 serial port (UART),
 or to a printer connected via a parallel port.
 The software may be writing data to a floppy disk
 or a spinning hard disk.
-It was self-evident to computer designers that it would
+It was self-evident to early computer designers that it would
 be unacceptable for data to be lost in these cases.
 
 # Direct Backpressure
 
 The early solutions were simple.
 When an application wrote data to a file on a floppy disk,
-the file system “write” API would not return to the caller
+the file system “write” API would not return control to the caller
 until the data had actually been written to the floppy disk.
 This had the natural effect of slowing down
-the application so it could not exceed
+the application so that it could not exceed
 the capacity of the medium to accept the data.
 
 Soon it became clear that these simple synchronous APIs
@@ -194,8 +195,9 @@ For a fast-paced video game, having a display pipeline fifty
 frames deep, where every frame is generated, then waits in
 the pipeline, and then is displayed fifty frames later,
 would not improve performance or efficiency,
-but would cause an unacceptable delay between a player
-action and seeing the results of that action on the screen.
+but would cause an unacceptable delay between
+a player performing an action and
+seeing the results of that action on the screen.
 It is beneficial for the video game to work on preparing
 the next frame while the previous frame is being displayed,
 but it is not beneficial for the video game to get multiple
@@ -219,8 +221,8 @@ put into the buffer next, when that opportunity arises.
 # Indirect Backpressure
 
 All of the situations described above using “direct backpressure”
-are one-hop communication where the receiving device is
-connected more-or-less directly to the CPU generating the data.
+are one-hop communication where the CPU generating the data
+is connected more-or-less directly to the device receiving the data.
 In these cases it is relatively simple for the receiving device
 to exert backpressure to influence the rate at which the CPU sends data.
 
@@ -255,7 +257,7 @@ feedback generated in the network follows the same path already
 taken by the data packets and their subsequent acknowledgement
 packets. The logic is that any on-path device that is able to
 modify data packets (changing the ECN bits in the IP header)
-could equally well corrupt or discard packets entirely.
+could equally well corrupt packets or discard them entirely.
 Thus, trusting ECN information from these devices does not
 increase security concerns, since these devices could already
 perform more malicious actions anyway. The sender already
@@ -290,7 +292,7 @@ with the assumption that these actions will eventually
 result in the sending application being throttled
 via having a write call blocked,
 returning an EWOULDBLOCK error,
-or exerting some other form of backpressure that
+or some other form of backpressure that
 causes the source application
 to temporarily pause sending new data.
 
@@ -326,7 +328,7 @@ This lead to the creation in May 2011
 of a new socket option on Mac OS and iOS
 called “TCP\_NOTSENT\_LOWAT”.
 This new socket option provided the ability for
-application software (like the VNC RFB server)
+sending software (like the VNC RFB server)
 to specify a low-water mark threshold for the
 minimum amount of **unsent** data it would like
 to have waiting in the socket send buffer.
@@ -371,7 +373,7 @@ to fully utilize the capacity of the path,
 without buffering so much unsent data
 that it adversely affected usability.
 
-A demo showing the benefits of using TCP\_NOTSENT\_LOWAT
+A live on-stage demo showing the benefits of using TCP\_NOTSENT\_LOWAT
 with VNC RFB screen sharing was shown at the
 Apple Worldwide Developer Conference in June 2015 {{Demo}}.
 
@@ -421,6 +423,7 @@ sending application specify how much advance notice
 of data exhaustion it required (in milliseconds, or microseconds),
 depending on how much time the application anticipated
 needing to generate its next logical block of data.
+
 The application could perform this calculation itself,
 calculating the estimated current data rate and dividing
 that by its desired advance notice time, to compute the number
@@ -431,15 +434,40 @@ Since the transport protocol already knows the number of
 unacknowledged bytes in flight, and the current round-trip delay,
 the transport protocol is in a better position
 to perform this calculation.
-The transport protocol also knows if features like hardware
-offload and stretch acks are being used, which could impact
-the burstiness of consumption of unsent bytes.
-If stretch acks are being used, and a couple of acks arrive
-acknowledging 12 kilobytes each, then a 16 kilobyte unsent
-backlog could be consumed almost instantly.
-Therefore it is better to have the transport protocol
-use all the information it has available to estimate
-when it expects to run out of unsent data.
+
+In addition, the network stack knows if features like hardware
+offload, aggregation, and stretch acks are being used,
+which could impact the burstiness of consumption of unsent bytes.
+
+Wi-Fi interfaces perform better when they send
+batches of packets aggregated together instead of
+sending individual packets one at a time.
+The amount of aggregation that is desirable depends
+on the current wireless conditions,
+so the Wi-Fi interface and its driver
+are in the best position to determine that.
+
+If stretch acks are being used, then each ack packet
+could acknowledge 8 data segments, or about 12 kilobytes.
+If one such ack packet is lost, the following ack packet
+will cumulatively acknowledge 24 kilobytes,
+instantly consuming the entire 16 kilobyte unsent backlog,
+and giving the application no advance notice that
+the transport protocol is suddenly out of available data to send,
+and some network capacity becomes wasted.
+
+Occasional failures to fully utilize the entire
+available network capacity are not a disaster, but we
+still would like to avoid this being a common occurrence.
+Therefore it is better to have the transport protocol,
+in cooperation with the other layers of the network stack,
+use all the information available to estimate
+when it expects to run out of data available to send,
+given the current network conditions
+and current amount of unsent data.
+When the estimated time remaining until exhaustion falls
+below the application’s specified threshold, the application
+is notified to begin working on generating more data.
 
 ## Other Transport Protocols
 
@@ -450,14 +478,14 @@ capabilities for other transport protocols, like QUIC.
 # TCP\_REPLENISH\_TIME
 
 Because of these lessons learned, this document proposes
-a new mechanism, TCP\_REPLENISH\_TIME.
+a new BSD Socket option for TCP, TCP\_REPLENISH\_TIME.
 
 The new TCP\_REPLENISH\_TIME socket option specifies the
 threshold for notifying an application of impending data
 exhaustion in terms of microseconds, not bytes.
 It is the job of the transport protocol to compute its
 best estimate of when the amount of remaining unsent data
-falls below the threshold.
+falls below this threshold.
 
 The new TCP\_REPLENISH\_TIME socket option
 should have the same semantics across all
@@ -479,7 +507,8 @@ protocol could end up discovering that it has overestimated how
 much time remains before the data is exhausted.
 If the operating system scheduler is slow to schedule the
 application process, or the CPU is busy with other tasks,
-then the application may take longer than expected
+then the application may discover that it has
+underestimated how much time it will take
 to generate its next logical block of data.
 These situations are not considered to be serious problems,
 especially if they only occur infrequently.
@@ -537,7 +566,7 @@ Where direct backpressure mechanisms are possible they
 should be preferred over indirect backpressure mechanisms.
 
 If the outgoing network interface on the source device
-is the slowest hop of the network path, then this
+is the slowest hop of a multi-hop network path, then this
 is where the backlog of unsent data will accumulate.
 
 In addition to physical bottlenecks,
@@ -547,10 +576,18 @@ devices also have intentional algorithmic bottlenecks:
 implementation will voluntarily refrain from sending new data,
 even though the device’s outgoing first-hop interface is easily
 capable of sending those packets.
+This is vital to avoid overrunning the receiver with data
+faster than it can process it.
 
 * The transport protocol’s rate management (congestion control) algorithm
 may determine that it should delay before sending more data, so as
 not to overflow a queue at some other bottleneck within the network.
+This is vital to avoid overrunning the capacity of the bottleneck
+network hop with data faster than it can forward it,
+resulting in massive packet loss,
+which would equate to a large wastage of resources at the sender,
+in the form of battery power and network capacity wasted by
+generating packets that will not make it to the receiver.
 
 * When packet pacing is being used, the sending network
 implementation may choose voluntarily to moderate the rate at
