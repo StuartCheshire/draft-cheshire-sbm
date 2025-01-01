@@ -3,7 +3,7 @@ title: "Source Buffer Management"
 abbrev: "Source Buffer Management"
 category: info
 
-docname: draft-cheshire-sbm-01
+docname: draft-cheshire-sbm-latest
 submissiontype: independent
 number:
 date: 2025-01-01
