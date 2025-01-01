@@ -22,18 +22,18 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.
 <meta content="Bufferbloat" name="keyword">
 <meta content="Latency" name="keyword">
 <meta content="Responsiveness" name="keyword">
-<meta content="draft-cheshire-sbm-00" name="ietf.draft">
+<meta content="draft-cheshire-sbm-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.25.0
-    Python 3.12.7
+    Python 3.12.8
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.4
     lxml 5.3.0
     platformdirs 4.3.6
-    pycountry 22.3.5
-    PyYAML 6.0.1
+    pycountry 24.6.1
+    PyYAML 6.0.2
     requests 2.32.3
     setuptools 70.3.0
     wcwidth 0.2.13
@@ -545,7 +545,11 @@ figcaption, caption {
   }
   pre, svg {
     display: inline-block;
-    overflow-x: auto;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
   }
   pre {
     max-width: 100%;
@@ -1051,11 +1055,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Source Buffer Management</td>
-<td class="right">December 2024</td>
+<td class="right">January 2025</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Cheshire</td>
-<td class="center">Expires 12 June 2025</td>
+<td class="center">Expires 5 July 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,15 +1069,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">Network Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-cheshire-sbm-00</dd>
+<dd class="internet-draft">draft-cheshire-sbm-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-09" class="published">9 December 2024</time>
+<time datetime="2025-01-01" class="published">1 January 2025</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-12">12 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-07-05">5 July 2025</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1127,7 +1131,7 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 July 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1136,7 +1140,7 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2024 IETF Trust and the persons identified as the
+            Copyright (c) 2025 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1260,8 +1264,9 @@ senders that are able to exceed the network capacity,
 and separates backpressure mechanisms into
 direct backpressure and indirect backpressure.<a href="#section-2-4" class="pilcrow">¶</a></p>
 <p id="section-2-5">The document concludes by describing
-the TCP_REPLENISH_TIME socket option,
-and its equivalent for other networking APIs.<a href="#section-2-5" class="pilcrow">¶</a></p>
+the TCP_REPLENISH_TIME socket option
+for TCP connections using BSD Sockets,
+and its equivalent for other networking protocols and APIs.<a href="#section-2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="source-buffering">
@@ -1278,7 +1283,7 @@ to an RS232 serial port (UART),
 or to a printer connected via a parallel port.
 The software may be writing data to a floppy disk
 or a spinning hard disk.
-It was self-evident to computer designers that it would
+It was self-evident to early computer designers that it would
 be unacceptable for data to be lost in these cases.<a href="#section-3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1289,10 +1294,10 @@ be unacceptable for data to be lost in these cases.<a href="#section-3-1" class=
       </h2>
 <p id="section-4-1">The early solutions were simple.
 When an application wrote data to a file on a floppy disk,
-the file system “write” API would not return to the caller
+the file system “write” API would not return control to the caller
 until the data had actually been written to the floppy disk.
 This had the natural effect of slowing down
-the application so it could not exceed
+the application so that it could not exceed
 the capacity of the medium to accept the data.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <p id="section-4-2">Soon it became clear that these simple synchronous APIs
 unreasonably limited the performance of the system.
@@ -1332,8 +1337,9 @@ For a fast-paced video game, having a display pipeline fifty
 frames deep, where every frame is generated, then waits in
 the pipeline, and then is displayed fifty frames later,
 would not improve performance or efficiency,
-but would cause an unacceptable delay between a player
-action and seeing the results of that action on the screen.
+but would cause an unacceptable delay between
+a player performing an action and
+seeing the results of that action on the screen.
 It is beneficial for the video game to work on preparing
 the next frame while the previous frame is being displayed,
 but it is not beneficial for the video game to get multiple
@@ -1360,8 +1366,8 @@ put into the buffer next, when that opportunity arises.<a href="#section-4-5" cl
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-indirect-backpressure" class="section-name selfRef">Indirect Backpressure</a>
       </h2>
 <p id="section-5-1">All of the situations described above using “direct backpressure”
-are one-hop communication where the receiving device is
-connected more-or-less directly to the CPU generating the data.
+are one-hop communication where the CPU generating the data
+is connected more-or-less directly to the device receiving the data.
 In these cases it is relatively simple for the receiving device
 to exert backpressure to influence the rate at which the CPU sends data.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <p id="section-5-2">When we introduce multi-hop networking,
@@ -1392,7 +1398,7 @@ feedback generated in the network follows the same path already
 taken by the data packets and their subsequent acknowledgement
 packets. The logic is that any on-path device that is able to
 modify data packets (changing the ECN bits in the IP header)
-could equally well corrupt or discard packets entirely.
+could equally well corrupt packets or discard them entirely.
 Thus, trusting ECN information from these devices does not
 increase security concerns, since these devices could already
 perform more malicious actions anyway. The sender already
@@ -1424,7 +1430,7 @@ with the assumption that these actions will eventually
 result in the sending application being throttled
 via having a write call blocked,
 returning an EWOULDBLOCK error,
-or exerting some other form of backpressure that
+or some other form of backpressure that
 causes the source application
 to temporarily pause sending new data.<a href="#section-5-8" class="pilcrow">¶</a></p>
 </section>
@@ -1462,7 +1468,7 @@ higher throughput or lower CPU utilization.<a href="#section-6-2" class="pilcrow
 of a new socket option on Mac OS and iOS
 called “TCP_NOTSENT_LOWAT”.
 This new socket option provided the ability for
-application software (like the VNC RFB server)
+sending software (like the VNC RFB server)
 to specify a low-water mark threshold for the
 minimum amount of <strong>unsent</strong> data it would like
 to have waiting in the socket send buffer.
@@ -1505,7 +1511,7 @@ This provided enough unsent data waiting to go out
 to fully utilize the capacity of the path,
 without buffering so much unsent data
 that it adversely affected usability.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">A demo showing the benefits of using TCP_NOTSENT_LOWAT
+<p id="section-6-5">A live on-stage demo showing the benefits of using TCP_NOTSENT_LOWAT
 with VNC RFB screen sharing was shown at the
 Apple Worldwide Developer Conference in June 2015 <span>[<a href="#Demo" class="cite xref">Demo</a>]</span>.<a href="#section-6-5" class="pilcrow">¶</a></p>
 </section>
@@ -1564,8 +1570,8 @@ It became clear that it would be more useful for the
 sending application specify how much advance notice
 of data exhaustion it required (in milliseconds, or microseconds),
 depending on how much time the application anticipated
-needing to generate its next logical block of data.
-The application could perform this calculation itself,
+needing to generate its next logical block of data.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">The application could perform this calculation itself,
 calculating the estimated current data rate and dividing
 that by its desired advance notice time, to compute the number
 of outstanding unsent bytes corresponding to that desired time.
@@ -1574,16 +1580,37 @@ TCP_NOTSENT_LOWAT value as the observed data rate changed.
 Since the transport protocol already knows the number of
 unacknowledged bytes in flight, and the current round-trip delay,
 the transport protocol is in a better position
-to perform this calculation.
-The transport protocol also knows if features like hardware
-offload and stretch acks are being used, which could impact
-the burstiness of consumption of unsent bytes.
-If stretch acks are being used, and a couple of acks arrive
-acknowledging 12 kilobytes each, then a 16 kilobyte unsent
-backlog could be consumed almost instantly.
-Therefore it is better to have the transport protocol
-use all the information it has available to estimate
-when it expects to run out of unsent data.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+to perform this calculation.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<p id="section-7.2-3">In addition, the network stack knows if features like hardware
+offload, aggregation, and stretch acks are being used,
+which could impact the burstiness of consumption of unsent bytes.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">Wi-Fi interfaces perform better when they send
+batches of packets aggregated together instead of
+sending individual packets one at a time.
+The amount of aggregation that is desirable depends
+on the current wireless conditions,
+so the Wi-Fi interface and its driver
+are in the best position to determine that.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-5">If stretch acks are being used, then each ack packet
+could acknowledge 8 data segments, or about 12 kilobytes.
+If one such ack packet is lost, the following ack packet
+will cumulatively acknowledge 24 kilobytes,
+instantly consuming the entire 16 kilobyte unsent backlog,
+and giving the application no advance notice that
+the transport protocol is suddenly out of available data to send,
+and some network capacity becomes wasted.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
+<p id="section-7.2-6">Occasional failures to fully utilize the entire
+available network capacity are not a disaster, but we
+still would like to avoid this being a common occurrence.
+Therefore it is better to have the transport protocol,
+in cooperation with the other layers of the network stack,
+use all the information available to estimate
+when it expects to run out of data available to send,
+given the current network conditions
+and current amount of unsent data.
+When the estimated time remaining until exhaustion falls
+below the application’s specified threshold, the application
+is notified to begin working on generating more data.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="other-transport-protocols">
@@ -1604,13 +1631,13 @@ capabilities for other transport protocols, like QUIC.<a href="#section-7.3-1" c
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-tcp_replenish_time" class="section-name selfRef">TCP_REPLENISH_TIME</a>
       </h2>
 <p id="section-8-1">Because of these lessons learned, this document proposes
-a new mechanism, TCP_REPLENISH_TIME.<a href="#section-8-1" class="pilcrow">¶</a></p>
+a new BSD Socket option for TCP, TCP_REPLENISH_TIME.<a href="#section-8-1" class="pilcrow">¶</a></p>
 <p id="section-8-2">The new TCP_REPLENISH_TIME socket option specifies the
 threshold for notifying an application of impending data
 exhaustion in terms of microseconds, not bytes.
 It is the job of the transport protocol to compute its
 best estimate of when the amount of remaining unsent data
-falls below the threshold.<a href="#section-8-2" class="pilcrow">¶</a></p>
+falls below this threshold.<a href="#section-8-2" class="pilcrow">¶</a></p>
 <p id="section-8-3">The new TCP_REPLENISH_TIME socket option
 should have the same semantics across all
 operating systems and network stack implementations.<a href="#section-8-3" class="pilcrow">¶</a></p>
@@ -1629,7 +1656,8 @@ protocol could end up discovering that it has overestimated how
 much time remains before the data is exhausted.
 If the operating system scheduler is slow to schedule the
 application process, or the CPU is busy with other tasks,
-then the application may take longer than expected
+then the application may discover that it has
+underestimated how much time it will take
 to generate its next logical block of data.
 These situations are not considered to be serious problems,
 especially if they only occur infrequently.
@@ -1686,7 +1714,7 @@ has the effect of immediately allowing the production of more data.<a href="#sec
 <p id="section-9-5">Where direct backpressure mechanisms are possible they
 should be preferred over indirect backpressure mechanisms.<a href="#section-9-5" class="pilcrow">¶</a></p>
 <p id="section-9-6">If the outgoing network interface on the source device
-is the slowest hop of the network path, then this
+is the slowest hop of a multi-hop network path, then this
 is where the backlog of unsent data will accumulate.<a href="#section-9-6" class="pilcrow">¶</a></p>
 <p id="section-9-7">In addition to physical bottlenecks,
 devices also have intentional algorithmic bottlenecks:<a href="#section-9-7" class="pilcrow">¶</a></p>
@@ -1695,12 +1723,20 @@ devices also have intentional algorithmic bottlenecks:<a href="#section-9-7" cla
           <p id="section-9-8.1.1">If the TCP receive window is full, then the sending TCP
 implementation will voluntarily refrain from sending new data,
 even though the device’s outgoing first-hop interface is easily
-capable of sending those packets.<a href="#section-9-8.1.1" class="pilcrow">¶</a></p>
+capable of sending those packets.
+This is vital to avoid overrunning the receiver with data
+faster than it can process it.<a href="#section-9-8.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-9-8.2">
           <p id="section-9-8.2.1">The transport protocol’s rate management (congestion control) algorithm
 may determine that it should delay before sending more data, so as
-not to overflow a queue at some other bottleneck within the network.<a href="#section-9-8.2.1" class="pilcrow">¶</a></p>
+not to overflow a queue at some other bottleneck within the network.
+This is vital to avoid overrunning the capacity of the bottleneck
+network hop with data faster than it can forward it,
+resulting in massive packet loss,
+which would equate to a large wastage of resources at the sender,
+in the form of battery power and network capacity wasted by
+generating packets that will not make it to the receiver.<a href="#section-9-8.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-9-8.3">
           <p id="section-9-8.3.1">When packet pacing is being used, the sending network
