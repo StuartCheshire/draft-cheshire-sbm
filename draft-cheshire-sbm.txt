@@ -4,8 +4,8 @@
 
 Network Working Group                                        S. Cheshire
 Internet-Draft                                                Apple Inc.
-Intended status: Informational                            1 January 2025
-Expires: 5 July 2025
+Intended status: Informational                            5 January 2025
+Expires: 9 July 2025
 
 
                         Source Buffer Management
@@ -51,7 +51,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 July 2025.
+   This Internet-Draft will expire on 9 July 2025.
 
 Copyright Notice
 
@@ -206,13 +206,13 @@ Table of Contents
    network, the bottleneck hop may be quite distant from the original
    source of the data stream.
 
-   For example, when a cable modem with a 35Mb/s output rate of receives
-   an excessive flow of packets coming in on its Gb/s Ethernet
-   interface, the cable modem cannot directly cause the sending
-   application to block or receive an EWOULDBLOCK error.  The cable
-   modem’s choices are limited to enqueueing an incoming packet,
-   discarding an incoming packet, or enqueueing an incoming packet and
-   marking with an ECN CE mark [RFC3168].
+   For example, when a cable modem with a 35Mb/s output rate receives an
+   excessive flow of packets coming in on its Gb/s Ethernet interface,
+   the cable modem cannot directly cause the sending application to
+   block or receive an EWOULDBLOCK error.  The cable modem’s choices are
+   limited to enqueueing an incoming packet, discarding an incoming
+   packet, or enqueueing an incoming packet and marking with an ECN CE
+   mark [RFC3168].
 
    The reasons the cable modem’s choices are so limited are because of
    security and packet size constraints.
