@@ -6,7 +6,7 @@ category: info
 docname: draft-cheshire-sbm-latest
 submissiontype: independent
 number:
-date: 2025-01-01
+date: 2025-01-05
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
@@ -233,7 +233,7 @@ a network, the bottleneck hop may be quite distant
 from the original source of the data stream.
 
 For example, when a cable modem
-with a 35Mb/s output rate of receives
+with a 35Mb/s output rate receives
 an excessive flow of packets coming in
 on its Gb/s Ethernet interface,
 the cable modem cannot directly cause
