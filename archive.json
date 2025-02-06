@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-04T01:01:05.335389+00:00",
+  "timestamp": "2025-02-06T01:02:02.127313+00:00",
   "repo": "StuartCheshire/draft-cheshire-sbm",
   "labels": [
     {
@@ -49,6 +49,50 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
-  "pulls": []
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDONZi1Cc6o3-Vh",
+      "title": "Regarding 'TCP_REPLENISH_TIME'",
+      "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/issues/2",
+      "state": "OPEN",
+      "author": "Kevsy",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "I think this is a compelling and well-written draft :)\n\nA question regarding the name  'TCP_REPLENISH_TIME': \n\n> The new TCP_REPLENISH_TIME socket option specifies the threshold for notifying an application of impending data exhaustion in terms of microseconds, not bytes. It is the job of the transport protocol to compute its best estimate of when the amount of remaining unsent data falls below the threshold.\n\nGiven the note on variability on the part of the application,\n\n> If the operating system scheduler is slow to schedule the application process, or the CPU is busy with other tasks, then the application may take longer than expected to generate its next logical block of data.\n\n...then  it seems that the transport protocol alone can not dictate the 'replenish' time, rather provide one part (the time to data exhaustion) that, together with the variable application process time, to advise the source buffer replenish time. \n\nHence could 'TCP_EXHAUSTION_TIME' be more appropriate? ",
+      "createdAt": "2025-02-05T15:18:32Z",
+      "updatedAt": "2025-02-05T15:18:32Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDONZi1Cc6KJ2nY",
+      "title": "fix: typos",
+      "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/pull/1",
+      "state": "OPEN",
+      "author": "Kevsy",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-02-05T14:58:48Z",
+      "updatedAt": "2025-02-05T14:58:49Z",
+      "baseRepository": "StuartCheshire/draft-cheshire-sbm",
+      "baseRefName": "main",
+      "baseRefOid": "62eb8b372424d01ab75c090d55e656dcda51acef",
+      "headRepository": "Kevsy/draft-cheshire-sbm",
+      "headRefName": "main",
+      "headRefOid": "efb2c180008d8eab0247b4da82dd4897fc926ad1",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
 }
