@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-02-25T01:04:19.946492+00:00",
+  "timestamp": "2025-02-27T01:03:46.796539+00:00",
   "repo": "StuartCheshire/draft-cheshire-sbm",
   "labels": [
     {
@@ -62,9 +62,24 @@
       "labels": [],
       "body": "I think this is a compelling and well-written draft :)\n\nA question regarding the name  'TCP_REPLENISH_TIME': \n\n> The new TCP_REPLENISH_TIME socket option specifies the threshold for notifying an application of impending data exhaustion in terms of microseconds, not bytes. It is the job of the transport protocol to compute its best estimate of when the amount of remaining unsent data falls below the threshold.\n\nGiven the note on variability on the part of the application,\n\n> If the operating system scheduler is slow to schedule the application process, or the CPU is busy with other tasks, then the application may take longer than expected to generate its next logical block of data.\n\n...then  it seems that the transport protocol alone can not dictate the 'replenish' time: rather it would provide one part (the time to data exhaustion) that, together with the variable application process time, informs the source buffer replenish time. \n\nHence could 'TCP_EXHAUSTION_TIME' be more appropriate? ",
       "createdAt": "2025-02-05T15:18:32Z",
-      "updatedAt": "2025-02-07T09:49:07Z",
+      "updatedAt": "2025-02-26T10:53:30Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "chris-box",
+          "authorAssociation": "NONE",
+          "body": "Agree on the positives.\n\nOn the question of the name, here we're putting ourselves in the shoes of the sending application, which is setting a socket option to say \"wake me up when you expect the buffer will be empty in 2ms\" (as an example). The value would be chosen based on how long it thinks it needs in order to generate new content. This will depend on CPU, intensiveness of the work, etc. It's simple for the application to record statistics on how long it has taken it previously, and use that as a prediction. It sets the option appropriately.\n\nFor me \"REPLENISH\" seems to make more sense in this context. It's \"how long I think I need to generate new content\".\n\nIn contrast \"EXHAUSTION\" is more of a statement about a network buffer.\n\nBoth are valid but I prefer the one that makes more sense to a developer who has seen only the name.\n",
+          "createdAt": "2025-02-25T20:59:13Z",
+          "updatedAt": "2025-02-25T20:59:13Z"
+        },
+        {
+          "author": "Kevsy",
+          "authorAssociation": "NONE",
+          "body": "Fair points @chris-box  - and REPLENISH sounds more positive too :)\n\nSo fine by me to keep the current naming. Will keep the issue open for visibility in case @StuartCheshire wants to add anything (or close it).",
+          "createdAt": "2025-02-26T10:53:29Z",
+          "updatedAt": "2025-02-26T10:53:29Z"
+        }
+      ]
     },
     {
       "number": 3,
