@@ -6,7 +6,7 @@ category: info
 docname: draft-cheshire-sbm-latest
 submissiontype: independent
 number:
-date: 2025-01-05
+date: 2025-03-03
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
@@ -126,10 +126,27 @@ senders that are able to exceed the network capacity,
 and separates backpressure mechanisms into
 direct backpressure and indirect backpressure.
 
-The document concludes by describing
+The document describes
 the TCP\_REPLENISH\_TIME socket option
 for TCP connections using BSD Sockets,
 and its equivalent for other networking protocols and APIs.
+
+The goal is for application software to be able to
+write chunks of data large enough to be efficient,
+without writing too many of them too quickly.
+This avoids the unfortunate situation where a delay-sensitive
+application inadvertently writes many blocks of data
+long before they will actually depart the source machine,
+such that by the time the enqueued data is actually sent,
+the application may have newer data that it would rather send instead.
+By deferring generating data until the networking code is
+actually ready to send it, the application retains more precise
+control over what data will be sent when the opportunity arises.
+
+The document concludes by describing some alternative
+solutions that are often proposed, and explains
+why we feel they are less effective than simply
+implementing effective source buffer management.
 
 # Source Buffering
 
@@ -218,6 +235,15 @@ If the backlog of unsent data is kept reasonably low,
 that gives the source more flexibility decide what to
 put into the buffer next, when that opportunity arises.
 
+In summary, in order to give applications maximum
+flexibility, pending data should be kept as close
+to the application for as long as possible.
+Application buffers should be as large as needed
+for the application to do its work,
+and lower-layer buffers should be no larger than
+is necessary to provide efficient use of available
+network capacity and other resources like CPU time.
+
 # Indirect Backpressure
 
 All of the situations described above using “direct backpressure”
@@ -286,7 +312,8 @@ the sender to converge on the ideal transmission rate, and
 then to oscillate slightly around the ideal transmission
 rate as it continues to track changing network conditions.
 
-Discarding or marking an incoming packet are
+Discarding or marking an incoming packet
+at some point within the network are
 what we refer to as indirect backpressure,
 with the assumption that these actions will eventually
 result in the sending application being throttled
@@ -471,9 +498,11 @@ is notified to begin working on generating more data.
 
 ## Other Transport Protocols
 
-TCP\_NOTSENT\_LOWAT was initially defined only for TCP.
+TCP\_NOTSENT\_LOWAT was initially defined only for TCP,
+and only for the BSD Sockets programming interface.
 It would be useful to define equivalent delay management
-capabilities for other transport protocols, like QUIC.
+capabilities for other transport protocols, like QUIC,
+and for other network programming APIs.
 
 # TCP\_REPLENISH\_TIME
 
@@ -518,6 +547,31 @@ dramatically better than having no such mechanism at all.
 Occasional overestimates or underestimates do not
 negate the benefit of this capability.
 
+## Solicitation for Name Suggestions
+
+Author’s note: The BSD socket option name “TCP\_REPLENISH\_TIME”
+is currently proposed as a working name
+for this new option for BSD Sockets.
+While the name does not affect the behavior of the code,
+the choice of name is important, because people often
+form their first impressions of a concept based on its name,
+and if they form incorrect first impressions then their
+thinking about the concept may be adversely affected.
+
+For example, the BSD socket option could be called
+“TCP\_REPLENISH\_TIME” or “TCP\_EXHAUSTION\_TIME”.
+These are two sides of the same coin.
+From the application’s point of view, it is expressing
+how much time it will require to replenish the buffer.
+From the networking code’s point of view, it is estimating
+how much time remains before it will need the buffer replenished.
+In an ideal world,
+REPLENISH\_TIME == EXHAUSTION\_TIME, so that the data is
+replenished at exactly the moment the networking code needs it.
+In a sense, they are two ways of saying the same thing.
+Since this API call is made by the application, we feel it
+should be expressed in terms of the application’s requirement.
+
 # Applicability
 
 This time-based backlog management is applicable anywhere
@@ -539,21 +593,27 @@ observed at the receiver and echoed back to the sender, and
 it may take multiple such round trips before it finally
 results in an appropriate reduction in sending rate.
 
-In contrast to queue buildup in the network, queue buildup
-at the sending device has different properties.
-When it is the source device itself that is building up a backlog
-of unsent data, it has more freedom about to handle this.
-When the source of the data and the location of the backlog is
-the same device, network security and trust concerns do not apply.
-When the mechanism we use to communicate about queue state
+In contrast to queue buildup in the network,
+queue buildup at the sending device has different properties
+regarding (i) security, (ii) packet size constraints, and (iii) immediacy.
+This means that when it is the source device itself
+that is building up a backlog of unsent data,
+designers of networking software have more freedom about how to manage this.
+
+(i) When the source of the data and the location of the backlog are
+the same physical device, network security and trust concerns do not apply.
+
+(ii) When the mechanism we use to communicate about queue state
 is a software API instead of packets sent though a network,
 we do not have the constraint of having to work within
-limited IP packet header space, and the delivery of queue
-state STOP/GO information to the source is immediate.
+limited IP packet header space.
+
+(iii) When flow control is implemented via a local software API,
+the delivery of STOP/GO information to the source is immediate.
 
 Direct backpressure can be achieved
 simply making an API call block,
-returning a Unix EWOULDBLOCK error,
+or by returning a Unix EWOULDBLOCK error,
 or using equivalent mechanisms in other APIs,
 and has the effect of immediately halting the flow of new data.
 Similarly, when the system becomes able to accept more data,
@@ -600,17 +660,125 @@ by a physical bottleneck on the sending device, or
 by an algorithmic bottleneck on the sending device,
 the benefits of not overcommitting data to the outgoing buffer are similar.
 
-The goal is for the application software to be able to
+As described in the introduction,
+the goal is for the application software to be able to
 write chunks of data large enough to be efficient,
-without writing too many of them too quickly.
-This avoids the unfortunate situation where a delay-sensitive
-application inadvertently writes many blocks of data
-long before they will actually depart the source machine,
-such that by the time the enqueued data is actually sent,
-the application may have newer data that it would rather send instead.
-By deferring generating data until the networking code is
-actually ready to send it, the application retains more precise
-control over what data will be sent when the opportunity arises.
+without writing too many of them too quickly,
+and causing unwanted self-inflicted delay.
+
+# Bulk Transfer Protocols
+
+It is frequently asserted that latency matters primarily for
+interactive applications like video conferencing and on-line games,
+and latency is relatively unimportant for most other applications.
+
+We do not agree with this characterization.
+
+Even for large bulk data transfers
+-- e.g., downloading a software update or uploading a video --
+we believe latency affects performance.
+
+For example, TCP fast retransmit can immediately
+recover a single lost packet in a single round-trip time.
+TCP generally performs at its absolute best when the
+loss rate is no more than one loss per round-trip time.
+More than one loss per round-trip time requires more
+extensive use of TCP SACK blocks, which consume extra
+space in the packet header, and makes the work of the
+rate management (congestion control) algorithm harder.
+This can result in the transport protocol temporarily
+sending too fast, resulting in additional packet loss,
+or too slowly, resulting in underutilized network capacity.
+For a given fixed loss rate (in packets lost per second)
+a higher total network round-trip time
+(including the time spent in buffers in the sending network
+interface, below the transport protocol layer)
+equates to more lost packets per network round-trip time,
+causing error recovery to occur less quickly.
+A transport protocol cannot make rate adaptation changes
+to adjust to varying network conditions in less than one
+network round-trip time, so the higher the total network
+round-trip time is, the less agile the transport protocol
+is at adjusting to varying network conditions.
+
+In short, a client running over a transport protocol like TCP
+may itself not be a real-time delay-sensitive application,
+but a transport protocol itself is most definitely a
+delay-sensitive application, responding in real time
+to changing network conditions.
+
+# Alternative Proposals
+
+## Just use UDP
+
+Because much of the discussion about network latency involves
+talking about the behavior of transport protocols like TCP,
+sometimes people conclude that TCP is the problem,
+and think that using UDP will solve the source buffering problem.
+It does no such thing.
+If an application sends UDP packets faster than the outgoing
+network interface can carry them, then a queue of packets
+will still build up, causing increasing delay for those packets,
+and eventual packet loss when the queue reaches its capacity.
+
+Any protocol that runs over UDP (like QUIC) must end up
+re-creating the same rate adaptation behaviors that are
+already built into TCP, or it will fail to operate
+gracefully over a range of different network conditions.
+
+## Packet Expiration
+
+One approach that is sometimes used, is to send packets
+tagged with an expiration time, and if they have spent
+too long waiting in the outgoing queue then they are
+automatically discarded without even being sent.
+This is counterproductive because the sending application
+does all the work to generate data, and then has to do more
+work to recover from the self-inflicted data loss caused by
+the expiration time.
+
+If the outgoing queue is kept short, then the
+amount of unwanted delay is kept correspondingly short.
+In addition, if there is only a small amount of data in the
+outgoing queue, then the cost of sending a small amount of
+data that may arguably have become stale is also small --
+usually smaller than the cost of having to recover missing
+state caused by intentional discard of that delayed data.
+
+For example, in video conferencing applications it is
+frequently thought that if a frame is delayed past the
+point where it becomes too late to display it, then it becomes
+a waste of network capacity to send that frame at all.
+However, the fallacy in that argument is that modern
+video compression algorithms make extensive use of
+similarity between consecutive frames.
+A given video frame is not just encoded as a single frame
+in isolation, but as a collection of visual
+differences relative to the previous frame.
+The previous frame may have arrived too late for the
+time it was supposed to be displayed, but the data
+contained within it is still needed to decode and
+display the current frame.
+If the previous frame was intentionally discarded by the
+sender, then the subsequent frames are also impacted by
+that loss, and the cost of repairing the damage is
+frequently much higher than the cost would have been
+to simply send the delayed frame.
+
+## Head of Line Blocking / Traffic Priorities
+
+People are often very concerned about the problem of
+head-of-line-blocking, and propose to solve it using
+techniques such as packet priorities.
+There is an unconscious unstated assumption baked into
+this line of reasoning, which is having an excessively
+long queue is inevitable and unavoidable, and therefore
+we have to devote a lot of our energy into how to organize
+and prioritize and manage that excessively long queue.
+In contrast, if we take steps to keep queues short,
+the problems head-of-line-blocking largely go away.
+When the line is consistently short, being at the back of
+the line is no longer the serious problem that it used to be.
 
 # Security Considerations
 
