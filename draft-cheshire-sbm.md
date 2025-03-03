@@ -101,7 +101,7 @@ In 2010 Jim Gettys identified the problem
 of how excessive buffering in networks adversely affects
 delay-sensitive applications {{Bloat1}}{{Bloat2}}{{Bloat3}}.
 This important work identifying a non-obvious problem
-has lead to valuable developments to improve this situation,
+has led to valuable developments to improve this situation,
 like fq_codel {{RFC8290}}, PIE {{RFC8033}}, Cake {{Cake}}
 and L4S {{RFC9330}}.
 
@@ -269,7 +269,7 @@ A consequence of this security requirement is that it takes a
 full round trip time for the source to learn about queue state
 in the network. In many common cases this is not a significant
 deficiency. For example, if a user is receiving data from a
-well connected server on the Internet, and the network
+well-connected server on the Internet, and the network
 bottleneck is the last hop on the path (e.g., the Wi-Fi hop to
 the user’s smartphone in their home) then the location where
 the queue is building up (the Wi-Fi Access Point) is very close
@@ -313,18 +313,18 @@ the socket send buffer (SO_SNDBUF) was set to 128 kilobytes.
 With a 50 ms round-trip time,
 about 3 kilobytes (roughly two packets)
 was sufficient to fill the bandwidth-delay product of the path.
-The remaining 125 kilobytes available in 128 kB socket send buffer
-was simply holding bytes that had not even been sent yet.
+The remaining 125 kilobytes available in the 128 kB socket send buffer
+were simply holding bytes that had not even been sent yet.
 At 500 kb/s throughput (62.5 kB/s),
 this meant that every byte written by the VNC RFB server
 spent two seconds sitting in the socket send buffer
 before it even left the source machine.
 Clearly, delaying every sent byte by two seconds
-resulted in a very sluggishness screen sharing experience,
+resulted in a very sluggish screen sharing experience,
 and it did not yield any useful benefit like
 higher throughput or lower CPU utilization.
 
-This lead to the creation in May 2011
+This led to the creation in May 2011
 of a new socket option on Mac OS and iOS
 called “TCP\_NOTSENT\_LOWAT”.
 This new socket option provided the ability for
@@ -397,7 +397,7 @@ above which the application is **prevented** from writing any more,
 even if it has data prepared and ready to enqueue.
 Setting TCP\_NOTSENT\_LOWAT to 16 kilobytes works well on Apple
 systems, but can severely limit throughput on Linux systems.
-This has lead to confusion among developers and makes it difficult
+This has led to confusion among developers and makes it difficult
 to write portable code that works on both platforms.
 
 ## Time Versus Bytes
