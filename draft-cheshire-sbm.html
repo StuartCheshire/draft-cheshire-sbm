@@ -18,14 +18,14 @@ caused by excessive buffering at the sender. These improvements
 are broadly applicable across all datagram and transport
 protocols (UDP, TCP, QUIC, etc.) on all operating systems. 
     " name="description">
-<meta content="xml2rfc 3.25.0" name="generator">
+<meta content="xml2rfc 3.28.0" name="generator">
 <meta content="Bufferbloat" name="keyword">
 <meta content="Latency" name="keyword">
 <meta content="Responsiveness" name="keyword">
 <meta content="draft-cheshire-sbm-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.25.0
-    Python 3.12.8
+  xml2rfc 3.28.0
+    Python 3.12.9
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
@@ -446,7 +446,7 @@ dl {
     margin-bottom: 0;
   }
 }
-dl > dt {
+dl:not(.dlNewline) > dt {
   float: left;
   margin-right: 2ch;
   min-width: 8ch;
@@ -1242,7 +1242,7 @@ appear in all capitals, as shown here.<a href="#section-1-1" class="pilcrow">¶<
 of how excessive buffering in networks adversely affects
 delay-sensitive applications <span>[<a href="#Bloat1" class="cite xref">Bloat1</a>]</span><span>[<a href="#Bloat2" class="cite xref">Bloat2</a>]</span><span>[<a href="#Bloat3" class="cite xref">Bloat3</a>]</span>.
 This important work identifying a non-obvious problem
-has lead to valuable developments to improve this situation,
+has led to valuable developments to improve this situation,
 like fq_codel <span>[<a href="#RFC8290" class="cite xref">RFC8290</a>]</span>, PIE <span>[<a href="#RFC8033" class="cite xref">RFC8033</a>]</span>, Cake <span>[<a href="#Cake" class="cite xref">Cake</a>]</span>
 and L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <p id="section-2-2">However, excessive buffering at the source
@@ -1409,7 +1409,7 @@ to the sender does not increase the security risk.<a href="#section-5-5" class="
 full round trip time for the source to learn about queue state
 in the network. In many common cases this is not a significant
 deficiency. For example, if a user is receiving data from a
-well connected server on the Internet, and the network
+well-connected server on the Internet, and the network
 bottleneck is the last hop on the path (e.g., the Wi-Fi hop to
 the user’s smartphone in their home) then the location where
 the queue is building up (the Wi-Fi Access Point) is very close
@@ -1454,17 +1454,17 @@ the socket send buffer (SO_SNDBUF) was set to 128 kilobytes.
 With a 50 ms round-trip time,
 about 3 kilobytes (roughly two packets)
 was sufficient to fill the bandwidth-delay product of the path.
-The remaining 125 kilobytes available in 128 kB socket send buffer
-was simply holding bytes that had not even been sent yet.
+The remaining 125 kilobytes available in the 128 kB socket send buffer
+were simply holding bytes that had not even been sent yet.
 At 500 kb/s throughput (62.5 kB/s),
 this meant that every byte written by the VNC RFB server
 spent two seconds sitting in the socket send buffer
 before it even left the source machine.
 Clearly, delaying every sent byte by two seconds
-resulted in a very sluggishness screen sharing experience,
+resulted in a very sluggish screen sharing experience,
 and it did not yield any useful benefit like
 higher throughput or lower CPU utilization.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">This lead to the creation in May 2011
+<p id="section-6-3">This led to the creation in May 2011
 of a new socket option on Mac OS and iOS
 called “TCP_NOTSENT_LOWAT”.
 This new socket option provided the ability for
@@ -1541,7 +1541,7 @@ above which the application is <strong>prevented</strong> from writing any more,
 even if it has data prepared and ready to enqueue.
 Setting TCP_NOTSENT_LOWAT to 16 kilobytes works well on Apple
 systems, but can severely limit throughput on Linux systems.
-This has lead to confusion among developers and makes it difficult
+This has led to confusion among developers and makes it difficult
 to write portable code that works on both platforms.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
