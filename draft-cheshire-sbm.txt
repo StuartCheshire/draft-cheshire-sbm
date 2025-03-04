@@ -239,8 +239,8 @@ Table of Contents
    the cable modem cannot directly cause the sending application to
    block or receive an EWOULDBLOCK error.  The cable modem’s choices are
    limited to enqueueing an incoming packet, discarding an incoming
-   packet, or enqueueing an incoming packet and marking with an ECN CE
-   mark [RFC3168].
+   packet, or enqueueing an incoming packet and marking it with an ECN
+   CE mark [RFC3168] [RFC9330].
 
    The reasons the cable modem’s choices are so limited are because of
    security and packet size constraints.
@@ -316,7 +316,7 @@ Table of Contents
    This led to the creation in May 2011 of a new socket option on Mac OS
    and iOS called “TCP_NOTSENT_LOWAT”. This new socket option provided
    the ability for sending software (like the VNC RFB server) to specify
-   a low-water mark threshold for the minimum amount of *unsent* data it
+   a low-water-mark threshold for the minimum amount of *unsent* data it
    would like to have waiting in the socket send buffer.  Instead of
    encouraging the application to fill the socket send buffer to its
    maximum capacity, the socket send buffer would hold just the data
@@ -332,9 +332,9 @@ Table of Contents
    because it increases delay without meaningfully increasing throughput
    or utilization.
 
-   Empirically it was found that setting an unsent data low-water mark
+   Empirically it was found that setting an unsent data low-water-mark
    threshold of 16 kilobytes worked well for VNC RFB screen sharing.
-   When the amount of unsent data fell below this low-water mark
+   When the amount of unsent data fell below this low-water-mark
    threshold, kevent() would wake up the VNC RFB screen sharing
    application to begin work on preparing the next frame to send.  Once
    the VNC RFB screen sharing application had prepared the next frame
@@ -548,7 +548,16 @@ Table of Contents
 
    If the outgoing network interface on the source device is the slowest
    hop of a multi-hop network path, then this is where the backlog of
-   unsent data will accumulate.
+   unsent data will accumulate.  This is often the case when a user has
+   symmetric 1Gb/s Internet service to the house, and they are accessing
+   the Internet service using a device connected via Wi-Fi at a rate
+   less than 1Gb/s.  This can produce the ironic outcome that upgrading
+   Internet service from 100Mb/s to 1Gb/s can sometimes result in a
+   customer getting a worse user experience, because the upgrade causes
+   the bottleneck hop to change location, from the Internet gateway
+   (which may have good queue mangement using L4S [RFC9330]) to the Wi-
+   Fi-connected device, which may have very poor source buffer
+   management.
 
    In addition to physical bottlenecks, devices also have intentional
    algorithmic bottlenecks:
@@ -573,7 +582,10 @@ Table of Contents
       implementation may choose voluntarily to moderate the rate at
       which it emits packets, so as to smooth the flow of packets into
       the network, even though the device’s outgoing first-hop interface
-      might be easily capable of sending at a much higher rate.
+      might be easily capable of sending at a much higher rate.  When
+      packet pacing is being used, a temporary backlog can build up at
+      this layer if the source is generating data faster than the pacing
+      rate.
 
    Whether the source application is constrained by a physical
    bottleneck on the sending device, or by an algorithmic bottleneck on
@@ -584,6 +596,24 @@ Table of Contents
    software to be able to write chunks of data large enough to be
    efficient, without writing too many of them too quickly, and causing
    unwanted self-inflicted delay.
+
+   It is important to understand that these backpressure mechanisms at
+   the API layer are not new.  They have existed by necessity for as
+   long as we have had networking APIs (or serial port APIs or file
+   system APIs).  The only difference here is that historically these
+   backpressure mechanisms were exercised too late, after an excessive
+   backlog had already built up.
+
+   The proposal in this Source Buffer Management document is not to
+   define entirely new API mechanisms that did not previously exist, or
+   to fundamentally change how networking applications are written; it
+   is primarily to use existing networking APIs more effectively.
+   Depending on how a networking application is written, using kevent()
+   or similar mechanisms to tell it when it is time to write to a
+   socket, it may be that the only change the application needs is to
+   use TCP_REPLENISH_TIME to indicate its expected time budget to
+   generate a new block of data, and everything else in the application
+   remains completely unchanged.
 
 10.  Bulk Transfer Protocols
 
@@ -670,20 +700,25 @@ Table of Contents
    intentionally discarded by the sender, then the subsequent frames are
    also impacted by that loss, and the cost of repairing the damage is
    frequently much higher than the cost would have been to simply send
-   the delayed frame.
+   the delayed frame.  Just because a frame arrives too late to be
+   displayed does not mean that the data within that frame is not
+   important.  The data contained with a frame is used not only to
+   display that frame, but also in the construction of subsequent
+   frames.
 
 11.3.  Head of Line Blocking / Traffic Priorities
 
    People are often very concerned about the problem of head-of-line-
    blocking, and propose to solve it using techniques such as packet
-   priorities.  There is an unconscious unstated assumption baked into
-   this line of reasoning, which is having an excessively long queue is
+   priorities, and the ability cancel unsent pending messages [MMADAPT].
+   There is an unconscious unstated assumption baked into this line of
+   reasoning, which is that having an excessively long queue is
    inevitable and unavoidable, and therefore we have to devote a lot of
    our energy into how to organize and prioritize and manage that
-   excessively long queue.  In contrast, if we take steps to keep queues
-   short, the problems head-of-line-blocking largely go away.  When the
-   line is consistently short, being at the back of the line is no
-   longer the serious problem that it used to be.
+   obligatory excessive queue.  In contrast, if we take steps to keep
+   queues short, the problems head-of-line-blocking largely go away.
+   When the line is consistently short, being at the back of the line is
+   no longer the serious problem that it used to be.
 
 12.  Security Considerations
 
@@ -734,6 +769,11 @@ Table of Contents
               <https://developer.apple.com/videos/play/
               wwdc2015/719/?time=2199>.
 
+   [MMADAPT]  Aiman Erbad and Charles Buck Krasic, "Sender-side buffers
+              and the case for multimedia adaptation", ACM Queue, Volume
+              10, issue 10 , October 2012,
+              <https://queue.acm.org/detail.cfm?id=2381998>.
+
    [RFC3168]  Ramakrishnan, K., Floyd, S., and D. Black, "The Addition
               of Explicit Congestion Notification (ECN) to IP",
               RFC 3168, DOI 10.17487/RFC3168, September 2001,
@@ -763,7 +803,12 @@ Table of Contents
 
 Acknowledgments
 
-   TODO Acknowledgments.
+   This document has benefited from input and suggestions from: Chris
+   Box, Morten Brørup, Neal Cardwell, Yuchung Cheng, Eric Dumazet,
+   Sebastian Moeller, Christoph Paasch, Kevin Smith, Ian Swett, all who
+   joined the side meeting at IETF 121 in Dublin (November 2024), and
+   others [please don’t be shy about reminding me if I somehow missed
+   your name].
 
 Author's Address
 
