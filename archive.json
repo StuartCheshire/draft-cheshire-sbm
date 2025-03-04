@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-02T01:07:53.366625+00:00",
+  "timestamp": "2025-03-04T01:04:52.042450+00:00",
   "repo": "StuartCheshire/draft-cheshire-sbm",
   "labels": [
     {
@@ -55,15 +55,15 @@
       "id": "I_kwDONZi1Cc6o3-Vh",
       "title": "Regarding 'TCP_REPLENISH_TIME'",
       "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/issues/2",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Kevsy",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I think this is a compelling and well-written draft :)\n\nA question regarding the name  'TCP_REPLENISH_TIME': \n\n> The new TCP_REPLENISH_TIME socket option specifies the threshold for notifying an application of impending data exhaustion in terms of microseconds, not bytes. It is the job of the transport protocol to compute its best estimate of when the amount of remaining unsent data falls below the threshold.\n\nGiven the note on variability on the part of the application,\n\n> If the operating system scheduler is slow to schedule the application process, or the CPU is busy with other tasks, then the application may take longer than expected to generate its next logical block of data.\n\n...then  it seems that the transport protocol alone can not dictate the 'replenish' time: rather it would provide one part (the time to data exhaustion) that, together with the variable application process time, informs the source buffer replenish time. \n\nHence could 'TCP_EXHAUSTION_TIME' be more appropriate? ",
       "createdAt": "2025-02-05T15:18:32Z",
-      "updatedAt": "2025-02-26T10:53:30Z",
-      "closedAt": null,
+      "updatedAt": "2025-03-03T22:31:18Z",
+      "closedAt": "2025-03-03T22:31:16Z",
       "comments": [
         {
           "author": "chris-box",
@@ -74,10 +74,17 @@
         },
         {
           "author": "Kevsy",
-          "authorAssociation": "NONE",
+          "authorAssociation": "CONTRIBUTOR",
           "body": "Fair points @chris-box  - and REPLENISH sounds more positive too :)\n\nSo fine by me to keep the current naming. Will keep the issue open for visibility in case @StuartCheshire wants to add anything (or close it).",
           "createdAt": "2025-02-26T10:53:29Z",
           "updatedAt": "2025-02-26T10:53:29Z"
+        },
+        {
+          "author": "StuartCheshire",
+          "authorAssociation": "OWNER",
+          "body": "Thanks for the comments. Chris Box is right. These are two sides of the same coin. From the application\u2019s point of view, it is specifying how much time it will require to replenish the buffer. From the networking code\u2019s point of view, it is estimating how much time remains before it will need the buffer replenished. In an ideal world, REPLENISH_TIME == EXHAUSTION_TIME, so that the data is replenished at exactly the moment the networking code needs it. In a sense, they are two ways of saying the same thing. Since this API call is made by the application, it is expressed in terms of the application\u2019s requirement.",
+          "createdAt": "2025-03-03T22:31:16Z",
+          "updatedAt": "2025-03-03T22:31:16Z"
         }
       ]
     },
@@ -88,14 +95,22 @@
       "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/issues/3",
       "state": "OPEN",
       "author": "Kevsy",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I found this text very useful in understanding the 'moving parts' , and think it could be included in a **Goal** section at the start of the document:\n\n\"  The goal is for the application software to be able to write chunks\n   of data large enough to be efficient, without writing too many of\n   them too quickly.  This avoids the unfortunate situation where a\n   delay-sensitive application inadvertently writes many blocks of data\n   long before they will actually depart the source machine, such that\n   by the time the enqueued data is actually sent, the application may\n   have newer data that it would rather send instead.  By deferring\n   generating data until the networking code is actually ready to send\n   it, the application retains more precise control over what data will\n   be sent when the opportunity arises.\"",
       "createdAt": "2025-02-06T14:39:18Z",
-      "updatedAt": "2025-02-06T14:39:18Z",
+      "updatedAt": "2025-03-03T22:37:44Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "StuartCheshire",
+          "authorAssociation": "OWNER",
+          "body": "Good suggestion. Thank you. I will move that text to the introduction.",
+          "createdAt": "2025-03-03T22:37:43Z",
+          "updatedAt": "2025-03-03T22:37:43Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -104,25 +119,35 @@
       "id": "PR_kwDONZi1Cc6KJ2nY",
       "title": "fix: typos",
       "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/pull/1",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "Kevsy",
-      "authorAssociation": "NONE",
+      "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2025-02-05T14:58:48Z",
-      "updatedAt": "2025-02-05T14:58:49Z",
+      "updatedAt": "2025-03-03T22:25:41Z",
       "baseRepository": "StuartCheshire/draft-cheshire-sbm",
       "baseRefName": "main",
       "baseRefOid": "62eb8b372424d01ab75c090d55e656dcda51acef",
       "headRepository": "Kevsy/draft-cheshire-sbm",
       "headRefName": "main",
       "headRefOid": "efb2c180008d8eab0247b4da82dd4897fc926ad1",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
-      "comments": [],
+      "closedAt": "2025-03-03T22:25:11Z",
+      "mergedAt": "2025-03-03T22:25:11Z",
+      "mergedBy": "StuartCheshire",
+      "mergeCommit": {
+        "oid": "a69d757578b1f32343632964625f40419badc59a"
+      },
+      "comments": [
+        {
+          "author": "StuartCheshire",
+          "authorAssociation": "OWNER",
+          "body": "Thank you for the edits. They have been merged in.",
+          "createdAt": "2025-03-03T22:25:39Z",
+          "updatedAt": "2025-03-03T22:25:39Z"
+        }
+      ],
       "reviews": []
     }
   ]
