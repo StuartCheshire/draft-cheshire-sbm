@@ -674,6 +674,29 @@ write chunks of data large enough to be efficient,
 without writing too many of them too quickly,
 and causing unwanted self-inflicted delay.
 
+It is important to understand that these
+backpressure mechanisms at the API layer are not new.
+They have existed by necessity for as long as we have had
+networking APIs (or serial port APIs or file system APIs).
+The only difference here is that historically
+these backpressure mechanisms were exercised too late,
+after an excessive backlog had already built up.
+
+The proposal in this Source Buffer Management
+document is not to define entirely new API mechanisms
+that did not previously exist, or to fundamentally
+change how networking applications are written;
+it is primarily to use existing networking APIs
+more effectively.
+Depending on how a networking application is written,
+using kevent() or similar mechanisms
+to tell it when it is time to write to a socket,
+it may be that the only change the application
+needs is to use TCP\_REPLENISH\_TIME to indicate
+its expected time budget to generate a new block
+of data, and everything else in the application
+remains completely unchanged.
+
 # Bulk Transfer Protocols
 
 It is frequently asserted that latency matters primarily for
