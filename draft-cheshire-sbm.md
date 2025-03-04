@@ -803,4 +803,15 @@ This document has no IANA actions.
 # Acknowledgments
 {:numbered="false"}
 
-TODO Acknowledgments.
+This document has benefited from input and suggestions from:
+Chris Box,
+Morten Brørup,
+Neal Cardwell,
+Yuchung Cheng,
+Eric Dumazet,
+Sebastian Moeller,
+Christoph Paasch,
+Kevin Smith,
+Ian Swett,
+all who joined the side meeting at IETF 121 in Dublin (November 2024),
+and others \[please don’t be shy about reminding me if I somehow missed your name\].
