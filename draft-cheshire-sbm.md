@@ -3,7 +3,7 @@ title: "Source Buffer Management"
 abbrev: "Source Buffer Management"
 category: info
 
-docname: draft-cheshire-sbm-latest
+docname: draft-cheshire-sbm-01
 submissiontype: independent
 number:
 date: 2025-03-03
@@ -75,6 +75,14 @@ informative:
   RFC8033:
   RFC8290:
   RFC9330:
+  MMADAPT:
+    author:
+     - ins: Aiman Erbad
+     - ins: Charles Buck Krasic
+    title: "Sender-side buffers and the case for multimedia adaptation"
+    date: October 2012
+    seriesinfo: ACM Queue, Volume 10, issue 10
+    target: https://queue.acm.org/detail.cfm?id=2381998
 
 --- abstract
 
@@ -769,12 +777,13 @@ to simply send the delayed frame.
 
 People are often very concerned about the problem of
 head-of-line-blocking, and propose to solve it using
-techniques such as packet priorities.
+techniques such as packet priorities,
+and the ability cancel unsent pending messages {{MMADAPT}}.
 There is an unconscious unstated assumption baked into
 this line of reasoning, which is having an excessively
 long queue is inevitable and unavoidable, and therefore
 we have to devote a lot of our energy into how to organize
-and prioritize and manage that excessively long queue.
+and prioritize and manage that obligatory excessively long queue.
 In contrast, if we take steps to keep queues short,
 the problems head-of-line-blocking largely go away.
 When the line is consistently short, being at the back of
