@@ -276,7 +276,7 @@ The cable modem’s choices are limited to
 enqueueing an incoming packet,
 discarding an incoming packet,
 or enqueueing an incoming packet and
-marking with an ECN CE mark {{RFC3168}}.
+marking it with an ECN CE mark {{RFC3168}} {{RFC9330}}.
 
 The reasons the cable modem’s choices are so limited
 are because of security and packet size constraints.
@@ -364,7 +364,7 @@ of a new socket option on Mac OS and iOS
 called “TCP\_NOTSENT\_LOWAT”.
 This new socket option provided the ability for
 sending software (like the VNC RFB server)
-to specify a low-water mark threshold for the
+to specify a low-water-mark threshold for the
 minimum amount of **unsent** data it would like
 to have waiting in the socket send buffer.
 Instead of encouraging the application to
@@ -387,10 +387,10 @@ because it increases delay without
 meaningfully increasing throughput or utilization.
 
 Empirically it was found that setting an
-unsent data low-water mark threshold of 16 kilobytes
+unsent data low-water-mark threshold of 16 kilobytes
 worked well for VNC RFB screen sharing.
 When the amount of unsent data fell below this
-low-water mark threshold, kevent() would
+low-water-mark threshold, kevent() would
 wake up the VNC RFB screen sharing application
 to begin work on preparing the next frame to send.
 Once the VNC RFB screen sharing application
@@ -636,6 +636,18 @@ should be preferred over indirect backpressure mechanisms.
 If the outgoing network interface on the source device
 is the slowest hop of a multi-hop network path, then this
 is where the backlog of unsent data will accumulate.
+This is often the case when a user has symmetric
+1Gb/s Internet service to the house, and they
+are accessing the Internet service using a device
+connected via Wi-Fi at a rate less than 1Gb/s.
+This can produce the ironic outcome that upgrading
+Internet service from 100Mb/s to 1Gb/s can sometimes result
+in a customer getting a worse user experience, because
+the upgrade causes the bottleneck hop to change location,
+from the Internet gateway
+(which may have good queue mangement using L4S {{RFC9330}})
+to the Wi-Fi-connected device,
+which may have very poor source buffer management.
 
 In addition to physical bottlenecks,
 devices also have intentional algorithmic bottlenecks:
@@ -662,6 +674,9 @@ implementation may choose voluntarily to moderate the rate at
 which it emits packets, so as to smooth the flow of packets into
 the network, even though the device’s outgoing first-hop interface
 might be easily capable of sending at a much higher rate.
+When packet pacing is being used, a temporary backlog
+can build up at this layer if the source is generating
+data faster than the pacing rate.
 
 Whether the source application is constrained
 by a physical bottleneck on the sending device, or
@@ -795,6 +810,10 @@ sender, then the subsequent frames are also impacted by
 that loss, and the cost of repairing the damage is
 frequently much higher than the cost would have been
 to simply send the delayed frame.
+Just because a frame arrives too late to be displayed does
+not mean that the data within that frame is not important.
+The data contained with a frame is used not only to display
+that frame, but also in the construction of subsequent frames.
 
 ## Head of Line Blocking / Traffic Priorities
 
@@ -803,10 +822,10 @@ head-of-line-blocking, and propose to solve it using
 techniques such as packet priorities,
 and the ability cancel unsent pending messages {{MMADAPT}}.
 There is an unconscious unstated assumption baked into
-this line of reasoning, which is having an excessively
+this line of reasoning, which is that having an excessively
 long queue is inevitable and unavoidable, and therefore
 we have to devote a lot of our energy into how to organize
-and prioritize and manage that obligatory excessively long queue.
+and prioritize and manage that obligatory excessive queue.
 In contrast, if we take steps to keep queues short,
 the problems head-of-line-blocking largely go away.
 When the line is consistently short, being at the back of
