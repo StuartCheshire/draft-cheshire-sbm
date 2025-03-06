@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-04T01:04:52.042450+00:00",
+  "timestamp": "2025-03-06T01:04:55.652386+00:00",
   "repo": "StuartCheshire/draft-cheshire-sbm",
   "labels": [
     {
@@ -93,15 +93,15 @@
       "id": "I_kwDONZi1Cc6pBbD3",
       "title": "Consider making the goal a section",
       "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/issues/3",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "Kevsy",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "I found this text very useful in understanding the 'moving parts' , and think it could be included in a **Goal** section at the start of the document:\n\n\"  The goal is for the application software to be able to write chunks\n   of data large enough to be efficient, without writing too many of\n   them too quickly.  This avoids the unfortunate situation where a\n   delay-sensitive application inadvertently writes many blocks of data\n   long before they will actually depart the source machine, such that\n   by the time the enqueued data is actually sent, the application may\n   have newer data that it would rather send instead.  By deferring\n   generating data until the networking code is actually ready to send\n   it, the application retains more precise control over what data will\n   be sent when the opportunity arises.\"",
       "createdAt": "2025-02-06T14:39:18Z",
-      "updatedAt": "2025-03-03T22:37:44Z",
-      "closedAt": null,
+      "updatedAt": "2025-03-04T03:01:05Z",
+      "closedAt": "2025-03-04T03:01:05Z",
       "comments": [
         {
           "author": "StuartCheshire",
