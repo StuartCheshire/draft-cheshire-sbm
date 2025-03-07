@@ -587,10 +587,102 @@ that a queue of unsent data may build up on the sending device.
 
 ## Physical Bottlenecks
 
+A backlog may build up on the sending device if the source
+of the packets is simply generating them faster than
+the outgoing first-hop interface is able to send them.
+This will cause a queue to build up in the network
+hardware or its associated driver.
+In this case,
+to avoid packets suffering excessive queueing delay,
+the hardware or its driver
+needs to communicate backpressure to IP, which
+needs to communicate backpressure to
+the transport protocol (TCP or QUIC), which
+needs to communicate backpressure to
+the application that is the source of the data.
+We refer to this case as a physical bottleneck.
+
+For an example of a physical bottleneck,
+consider the case when a user has symmetric
+1Gb/s Internet service,
+and they are sending data from a device
+communicating via Wi-Fi at a lower rate, say 300 Mb/s.
+In this case (assuming it is communicating with a
+well-connected server on the Internet) the sending
+device’s Wi-Fi interface is the limiting factor.
+If the Wi-Fi hardware, driver, and networking software
+does not produce appropriate backpressure, then outgoing
+network traffic will experience increasing delays.
+
+Poor backpressure from first-hop physical bottlenecks
+can produce the ironic outcome that upgrading
+home Internet service from 100Mb/s to 1Gb/s can sometimes
+result in a customer getting a worse user experience,
+because the upgrade causes the bottleneck hop to change location,
+from the Internet gateway
+(which may have good queue mangement using L4S {{RFC9330}})
+to the source device’s Wi-Fi interface,
+which may have very poor source buffer management.
+
+## Algorithmic Bottlenecks
+
+In addition to physical bottlenecks,
+there are other reasons why software on the sending
+device may choose to refrain from sending data as fast
+as the outgoing first-hop interface can carry it.
+We refer to these as algorithmic bottlenecks.
+
+In the case study in {{casestudy}}, the bottleneck was the
+transport protocol’s rate management (congestion control) algorithm,
+not a physical constraint of the outgoing first-hop interface
+(which was gigabit Ethernet).
+
+* If the TCP receive window is full, then the sending TCP
+implementation will voluntarily refrain from sending new data,
+even though the device’s outgoing first-hop interface is easily
+capable of sending those packets.
+This is vital to avoid overrunning the receiver with data
+faster than it can process it.
+
+* The transport protocol’s rate management (congestion control) algorithm
+may determine that it should delay before sending more data, so as
+not to overflow a queue at some other bottleneck within the network.
+This is vital to avoid overrunning the capacity of the bottleneck
+network hop with data faster than it can forward it,
+resulting in massive packet loss,
+which would equate to a large wastage of resources at the sender,
+in the form of battery power and network capacity wasted by
+generating packets that will not make it to the receiver.
+
+* When packet pacing is being used, the sending network
+implementation may choose voluntarily to moderate the rate at
+which it emits packets, so as to smooth the flow of packets into
+the network, even though the device’s outgoing first-hop interface
+might be easily capable of sending at a much higher rate.
+When packet pacing is being used, a temporary backlog
+can build up at this layer if the source is generating
+data faster than the pacing rate.
+
+Whether the source application is constrained
+by a physical bottleneck on the sending device, or
+by an algorithmic bottleneck on the sending device,
+the benefits of not overcommitting data to the outgoing buffer are similar.
+
+As described in the introduction,
+the goal is for the application software to be able to
+write chunks of data large enough to be efficient,
+without writing too many of them too quickly,
+and causing unwanted self-inflicted delay.
+
+## Superiority of Direct Backpressure
+
 Since multi-hop network protocols already implement
 indirect backpressure in the form of discarding or marking packets,
-it can be tempting to use this mechanism
-for the first hop of the path too.
+it can be tempting to use the same mechanism
+to generate backpressure for first-hop physical bottlenecks.
+Superficially there might seem to be some attractive
+elegance in having the first hop use the same drop/mark
+mechanism as the remaining hops on the path.
 However, this is not an ideal solution because indirect
 backpressure from the network is very crude compared to
 the much richer direct backpressure
@@ -632,66 +724,23 @@ has become writable using select() or kevent(),
 or equivalent mechanisms in other APIs,
 has the effect of immediately allowing the production of more data.
 
-Where direct backpressure mechanisms are possible they
+Indirect backpressure is vastly inferior to direct backpressure.
+For rate adjustment signals generated within the network,
+indirect backpressure has to be used because
+in that situation better alternatives are not available.
+Direct backpressure is vastly superior,
+and where direct backpressure mechanisms are possible they
 should be preferred over indirect backpressure mechanisms.
 
-If the outgoing network interface on the source device
-is the slowest hop of a multi-hop network path, then this
-is where the backlog of unsent data will accumulate.
-This is often the case when a user has symmetric
-1Gb/s Internet service to the house, and they
-are accessing the Internet service using a device
-connected via Wi-Fi at a rate less than 1Gb/s.
-This can produce the ironic outcome that upgrading
-Internet service from 100Mb/s to 1Gb/s can sometimes result
-in a customer getting a worse user experience, because
-the upgrade causes the bottleneck hop to change location,
-from the Internet gateway
-(which may have good queue mangement using L4S {{RFC9330}})
-to the Wi-Fi-connected device,
-which may have very poor source buffer management.
-
-## Algorithmic Bottlenecks
-
-In addition to physical bottlenecks,
-devices also have intentional algorithmic bottlenecks:
-
-* If the TCP receive window is full, then the sending TCP
-implementation will voluntarily refrain from sending new data,
-even though the device’s outgoing first-hop interface is easily
-capable of sending those packets.
-This is vital to avoid overrunning the receiver with data
-faster than it can process it.
-
-* The transport protocol’s rate management (congestion control) algorithm
-may determine that it should delay before sending more data, so as
-not to overflow a queue at some other bottleneck within the network.
-This is vital to avoid overrunning the capacity of the bottleneck
-network hop with data faster than it can forward it,
-resulting in massive packet loss,
-which would equate to a large wastage of resources at the sender,
-in the form of battery power and network capacity wasted by
-generating packets that will not make it to the receiver.
-
-* When packet pacing is being used, the sending network
-implementation may choose voluntarily to moderate the rate at
-which it emits packets, so as to smooth the flow of packets into
-the network, even though the device’s outgoing first-hop interface
-might be easily capable of sending at a much higher rate.
-When packet pacing is being used, a temporary backlog
-can build up at this layer if the source is generating
-data faster than the pacing rate.
-
-Whether the source application is constrained
-by a physical bottleneck on the sending device, or
-by an algorithmic bottleneck on the sending device,
-the benefits of not overcommitting data to the outgoing buffer are similar.
-
-As described in the introduction,
-the goal is for the application software to be able to
-write chunks of data large enough to be efficient,
-without writing too many of them too quickly,
-and causing unwanted self-inflicted delay.
+While there might seem to be some attractive elegance
+to using indirect backpressure for all hops in the network,
+having the first hop be the bottleneck is a common case,
+and that is the case where indirect backpressure is at
+its worst (it takes an entire network round trip to
+learn what is already known on the sending device),
+so the benefits mean that it is worth
+optimizing for this common case and making use
+of direct backpressure for first hop bottlenecks.
 
 ## Application Programming Interface
 
