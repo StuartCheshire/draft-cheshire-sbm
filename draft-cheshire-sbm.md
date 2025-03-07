@@ -156,7 +156,7 @@ solutions that are often proposed, and explains
 why we feel they are less effective than simply
 implementing effective source buffer management.
 
-# Source Buffering
+# Source Buffer Backpressure
 
 Starting with the most basic principles,
 computers have always had to deal with the situation
@@ -170,7 +170,7 @@ or a spinning hard disk.
 It was self-evident to early computer designers that it would
 be unacceptable for data to be lost in these cases.
 
-# Direct Backpressure
+## Direct Backpressure
 
 The early solutions were simple.
 When an application wrote data to a file on a floppy disk,
@@ -252,7 +252,7 @@ and lower-layer buffers should be no larger than
 is necessary to provide efficient use of available
 network capacity and other resources like CPU time.
 
-# Indirect Backpressure
+## Indirect Backpressure
 
 All of the situations described above using “direct backpressure”
 are one-hop communication where the CPU generating the data
@@ -331,7 +331,7 @@ or some other form of backpressure that
 causes the source application
 to temporarily pause sending new data.
 
-# Case Study -- TCP\_NOTSENT\_LOWAT
+# Case Study -- TCP\_NOTSENT\_LOWAT {#casestudy}
 
 In April 2011 the author was investigating
 sluggishness with Mac OS Screen Sharing,
@@ -435,7 +435,7 @@ systems, but can severely limit throughput on Linux systems.
 This has led to confusion among developers and makes it difficult
 to write portable code that works on both platforms.
 
-## Time Versus Bytes
+## Time versus Bytes
 
 The original thinking on TCP\_NOTSENT\_LOWAT focussed on
 the number of unsent bytes remaining, but it soon became
@@ -585,6 +585,8 @@ should be expressed in terms of the application’s requirement.
 This time-based backlog management is applicable anywhere
 that a queue of unsent data may build up on the sending device.
 
+## Physical Bottlenecks
+
 Since multi-hop network protocols already implement
 indirect backpressure in the form of discarding or marking packets,
 it can be tempting to use this mechanism
@@ -649,6 +651,8 @@ from the Internet gateway
 to the Wi-Fi-connected device,
 which may have very poor source buffer management.
 
+## Algorithmic Bottlenecks
+
 In addition to physical bottlenecks,
 devices also have intentional algorithmic bottlenecks:
 
@@ -689,6 +693,8 @@ write chunks of data large enough to be efficient,
 without writing too many of them too quickly,
 and causing unwanted self-inflicted delay.
 
+## Application Programming Interface
+
 It is important to understand that these
 backpressure mechanisms at the API layer are not new.
 They have existed by necessity for as long as we have had
@@ -712,7 +718,7 @@ its expected time budget to generate a new block
 of data, and everything else in the application
 remains completely unchanged.
 
-# Bulk Transfer Protocols
+## Bulk Transfer Protocols
 
 It is frequently asserted that latency matters primarily for
 interactive applications like video conferencing and on-line games,
