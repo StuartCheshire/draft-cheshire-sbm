@@ -68,27 +68,30 @@ Table of Contents
 
    1.  Conventions and Definitions
    2.  Introduction
-   3.  Source Buffering
-   4.  Direct Backpressure
-   5.  Indirect Backpressure
-   6.  Case Study -- TCP_NOTSENT_LOWAT
-   7.  Shortcomings of TCP_NOTSENT_LOWAT
-     7.1.  Platform Differences
-     7.2.  Time Versus Bytes
-     7.3.  Other Transport Protocols
-   8.  TCP_REPLENISH_TIME
-     8.1.  Solicitation for Name Suggestions
-   9.  Applicability
-   10. Bulk Transfer Protocols
-   11. Alternative Proposals
-     11.1.  Just use UDP
-     11.2.  Packet Expiration
-     11.3.  Head of Line Blocking / Traffic Priorities
-   12. Security Considerations
-   13. IANA Considerations
-   14. References
-     14.1.  Normative References
-     14.2.  Informative References
+   3.  Source Buffer Backpressure
+     3.1.  Direct Backpressure
+     3.2.  Indirect Backpressure
+   4.  Case Study -- TCP_NOTSENT_LOWAT
+   5.  Shortcomings of TCP_NOTSENT_LOWAT
+     5.1.  Platform Differences
+     5.2.  Time versus Bytes
+     5.3.  Other Transport Protocols
+   6.  TCP_REPLENISH_TIME
+     6.1.  Solicitation for Name Suggestions
+   7.  Applicability
+     7.1.  Physical Bottlenecks
+     7.2.  Algorithmic Bottlenecks
+     7.3.  Application Programming Interface
+     7.4.  Bulk Transfer Protocols
+   8.  Alternative Proposals
+     8.1.  Just use UDP
+     8.2.  Packet Expiration
+     8.3.  Head of Line Blocking / Traffic Priorities
+   9.  Security Considerations
+   10. IANA Considerations
+   11. References
+     11.1.  Normative References
+     11.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -144,7 +147,7 @@ Table of Contents
    are often proposed, and explains why we feel they are less effective
    than simply implementing effective source buffer management.
 
-3.  Source Buffering
+3.  Source Buffer Backpressure
 
    Starting with the most basic principles, computers have always had to
    deal with the situation where software is able to generate output
@@ -155,7 +158,7 @@ Table of Contents
    self-evident to early computer designers that it would be
    unacceptable for data to be lost in these cases.
 
-4.  Direct Backpressure
+3.1.  Direct Backpressure
 
    The early solutions were simple.  When an application wrote data to a
    file on a floppy disk, the file system “write” API would not return
@@ -221,7 +224,7 @@ Table of Contents
    larger than is necessary to provide efficient use of available
    network capacity and other resources like CPU time.
 
-5.  Indirect Backpressure
+3.2.  Indirect Backpressure
 
    All of the situations described above using “direct backpressure” are
    one-hop communication where the CPU generating the data is connected
@@ -290,7 +293,7 @@ Table of Contents
    that causes the source application to temporarily pause sending new
    data.
 
-6.  Case Study -- TCP_NOTSENT_LOWAT
+4.  Case Study -- TCP_NOTSENT_LOWAT
 
    In April 2011 the author was investigating sluggishness with Mac OS
    Screen Sharing, which uses the VNC Remote Framebuffer (RFB) protocol
@@ -351,12 +354,12 @@ Table of Contents
    with VNC RFB screen sharing was shown at the Apple Worldwide
    Developer Conference in June 2015 [Demo].
 
-7.  Shortcomings of TCP_NOTSENT_LOWAT
+5.  Shortcomings of TCP_NOTSENT_LOWAT
 
    While TCP_NOTSENT_LOWAT achieved its initial intended goal, later
    operational experience has revealed some shortcomings.
 
-7.1.  Platform Differences
+5.1.  Platform Differences
 
    The Linux network maintainers implemented a TCP socket option with
    the same name, but different behavior.  While the Apple version of
@@ -372,7 +375,7 @@ Table of Contents
    has led to confusion among developers and makes it difficult to write
    portable code that works on both platforms.
 
-7.2.  Time Versus Bytes
+5.2.  Time versus Bytes
 
    The original thinking on TCP_NOTSENT_LOWAT focussed on the number of
    unsent bytes remaining, but it soon became clear that the relevant
@@ -430,14 +433,14 @@ Table of Contents
    application’s specified threshold, the application is notified to
    begin working on generating more data.
 
-7.3.  Other Transport Protocols
+5.3.  Other Transport Protocols
 
    TCP_NOTSENT_LOWAT was initially defined only for TCP, and only for
    the BSD Sockets programming interface.  It would be useful to define
    equivalent delay management capabilities for other transport
    protocols, like QUIC, and for other network programming APIs.
 
-8.  TCP_REPLENISH_TIME
+6.  TCP_REPLENISH_TIME
 
    Because of these lessons learned, this document proposes a new BSD
    Socket option for TCP, TCP_REPLENISH_TIME.
@@ -475,7 +478,7 @@ Table of Contents
    all.  Occasional overestimates or underestimates do not negate the
    benefit of this capability.
 
-8.1.  Solicitation for Name Suggestions
+6.1.  Solicitation for Name Suggestions
 
    Author’s note: The BSD socket option name “TCP_REPLENISH_TIME” is
    currently proposed as a working name for this new option for BSD
@@ -497,10 +500,12 @@ Table of Contents
    call is made by the application, we feel it should be expressed in
    terms of the application’s requirement.
 
-9.  Applicability
+7.  Applicability
 
    This time-based backlog management is applicable anywhere that a
    queue of unsent data may build up on the sending device.
+
+7.1.  Physical Bottlenecks
 
    Since multi-hop network protocols already implement indirect
    backpressure in the form of discarding or marking packets, it can be
@@ -559,6 +564,8 @@ Table of Contents
    Fi-connected device, which may have very poor source buffer
    management.
 
+7.2.  Algorithmic Bottlenecks
+
    In addition to physical bottlenecks, devices also have intentional
    algorithmic bottlenecks:
 
@@ -597,6 +604,8 @@ Table of Contents
    efficient, without writing too many of them too quickly, and causing
    unwanted self-inflicted delay.
 
+7.3.  Application Programming Interface
+
    It is important to understand that these backpressure mechanisms at
    the API layer are not new.  They have existed by necessity for as
    long as we have had networking APIs (or serial port APIs or file
@@ -615,7 +624,7 @@ Table of Contents
    generate a new block of data, and everything else in the application
    remains completely unchanged.
 
-10.  Bulk Transfer Protocols
+7.4.  Bulk Transfer Protocols
 
    It is frequently asserted that latency matters primarily for
    interactive applications like video conferencing and on-line games,
@@ -651,9 +660,9 @@ Table of Contents
    transport protocol itself is most definitely a delay-sensitive
    application, responding in real time to changing network conditions.
 
-11.  Alternative Proposals
+8.  Alternative Proposals
 
-11.1.  Just use UDP
+8.1.  Just use UDP
 
    Because much of the discussion about network latency involves talking
    about the behavior of transport protocols like TCP, sometimes people
@@ -669,7 +678,7 @@ Table of Contents
    or it will fail to operate gracefully over a range of different
    network conditions.
 
-11.2.  Packet Expiration
+8.2.  Packet Expiration
 
    One approach that is sometimes used, is to send packets tagged with
    an expiration time, and if they have spent too long waiting in the
@@ -706,7 +715,7 @@ Table of Contents
    display that frame, but also in the construction of subsequent
    frames.
 
-11.3.  Head of Line Blocking / Traffic Priorities
+8.3.  Head of Line Blocking / Traffic Priorities
 
    People are often very concerned about the problem of head-of-line-
    blocking, and propose to solve it using techniques such as packet
@@ -720,18 +729,18 @@ Table of Contents
    When the line is consistently short, being at the back of the line is
    no longer the serious problem that it used to be.
 
-12.  Security Considerations
+9.  Security Considerations
 
    No security concerns are anticipated resulting from reducing the
    amount of stale data sitting in buffers at the sender.
 
-13.  IANA Considerations
+10.  IANA Considerations
 
    This document has no IANA actions.
 
-14.  References
+11.  References
 
-14.1.  Normative References
+11.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -742,7 +751,7 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-14.2.  Informative References
+11.2.  Informative References
 
    [Bloat1]   Gettys, J., "Whose house is of glasse, must not throw
               stones at another", December 2010,

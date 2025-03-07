@@ -1164,81 +1164,94 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
             <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-source-buffering" class="internal xref">Source Buffering</a></p>
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-source-buffer-backpressure" class="internal xref">Source Buffer Backpressure</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-direct-backpressure" class="internal xref">Direct Backpressure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-indirect-backpressure" class="internal xref">Indirect Backpressure</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-direct-backpressure" class="internal xref">Direct Backpressure</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-case-study-tcp_notsent_lowa" class="internal xref">Case Study -- TCP_NOTSENT_LOWAT</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-indirect-backpressure" class="internal xref">Indirect Backpressure</a></p>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-shortcomings-of-tcp_notsent" class="internal xref">Shortcomings of TCP_NOTSENT_LOWAT</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-platform-differences" class="internal xref">Platform Differences</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-time-versus-bytes" class="internal xref">Time versus Bytes</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-other-transport-protocols" class="internal xref">Other Transport Protocols</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-case-study-tcp_notsent_lowa" class="internal xref">Case Study -- TCP_NOTSENT_LOWAT</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-tcp_replenish_time" class="internal xref">TCP_REPLENISH_TIME</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-solicitation-for-name-sugge" class="internal xref">Solicitation for Name Suggestions</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-shortcomings-of-tcp_notsent" class="internal xref">Shortcomings of TCP_NOTSENT_LOWAT</a></p>
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-applicability" class="internal xref">Applicability</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-platform-differences" class="internal xref">Platform Differences</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-physical-bottlenecks" class="internal xref">Physical Bottlenecks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-time-versus-bytes" class="internal xref">Time Versus Bytes</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-algorithmic-bottlenecks" class="internal xref">Algorithmic Bottlenecks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-other-transport-protocols" class="internal xref">Other Transport Protocols</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-application-programming-int" class="internal xref">Application Programming Interface</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-tcp_replenish_time" class="internal xref">TCP_REPLENISH_TIME</a></p>
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-alternative-proposals" class="internal xref">Alternative Proposals</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-solicitation-for-name-sugge" class="internal xref">Solicitation for Name Suggestions</a></p>
+                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-just-use-udp" class="internal xref">Just use UDP</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-packet-expiration" class="internal xref">Packet Expiration</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
+                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-head-of-line-blocking-traff" class="internal xref">Head of Line Blocking / Traffic Priorities</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-applicability" class="internal xref">Applicability</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-alternative-proposals" class="internal xref">Alternative Proposals</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-references" class="internal xref">References</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-just-use-udp" class="internal xref">Just use UDP</a></p>
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-packet-expiration" class="internal xref">Packet Expiration</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-head-of-line-blocking-traff" class="internal xref">Head of Line Blocking / Traffic Priorities</a></p>
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
-</li>
-            </ul>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1306,10 +1319,10 @@ why we feel they are less effective than simply
 implementing effective source buffer management.<a href="#section-2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="source-buffering">
+<div id="source-buffer-backpressure">
 <section id="section-3">
-      <h2 id="name-source-buffering">
-<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-source-buffering" class="section-name selfRef">Source Buffering</a>
+      <h2 id="name-source-buffer-backpressure">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-source-buffer-backpressure" class="section-name selfRef">Source Buffer Backpressure</a>
       </h2>
 <p id="section-3-1">Starting with the most basic principles,
 computers have always had to deal with the situation
@@ -1322,21 +1335,19 @@ The software may be writing data to a floppy disk
 or a spinning hard disk.
 It was self-evident to early computer designers that it would
 be unacceptable for data to be lost in these cases.<a href="#section-3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="direct-backpressure">
-<section id="section-4">
-      <h2 id="name-direct-backpressure">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-direct-backpressure" class="section-name selfRef">Direct Backpressure</a>
-      </h2>
-<p id="section-4-1">The early solutions were simple.
+<section id="section-3.1">
+        <h3 id="name-direct-backpressure">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-direct-backpressure" class="section-name selfRef">Direct Backpressure</a>
+        </h3>
+<p id="section-3.1-1">The early solutions were simple.
 When an application wrote data to a file on a floppy disk,
 the file system “write” API would not return control to the caller
 until the data had actually been written to the floppy disk.
 This had the natural effect of slowing down
 the application so that it could not exceed
-the capacity of the medium to accept the data.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Soon it became clear that these simple synchronous APIs
+the capacity of the medium to accept the data.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-2">Soon it became clear that these simple synchronous APIs
 unreasonably limited the performance of the system.
 If, instead, the file system “write” API
 were to return to the caller immediately
@@ -1344,8 +1355,8 @@ were to return to the caller immediately
 spinning hard disk had not yet completed --
 then the application could get on with other
 useful work while the actual write to the
-spinning hard disk proceeded in parallel.<a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">Some systems allowed a single asynchronous write
+spinning hard disk proceeded in parallel.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3.1-3">Some systems allowed a single asynchronous write
 to the spinning hard disk to proceed while
 the application software performed other processing.
 Other systems allowed multiple asynchronous writes to be enqueued,
@@ -1360,8 +1371,8 @@ removing its ability to do anything else)
 or by returning a Unix EWOULDBLOCK error or similar
 (to inform the application that its API call had
 been unsuccessful, and that it would need to take
-action to write its data again at a later time).<a href="#section-4-3" class="pilcrow">¶</a></p>
-<p id="section-4-4">It is informative to observe a comparison with graphics cards.
+action to write its data again at a later time).<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">It is informative to observe a comparison with graphics cards.
 Most graphics cards support double-buffering.
 This allows one frame to be displayed while
 the CPU and GPU are working on generating the next frame.
@@ -1380,8 +1391,8 @@ seeing the results of that action on the screen.
 It is beneficial for the video game to work on preparing
 the next frame while the previous frame is being displayed,
 but it is not beneficial for the video game to get multiple
-frames ahead of the frame currently being displayed.<a href="#section-4-4" class="pilcrow">¶</a></p>
-<p id="section-4-5">Another reason that it is good not to permit an
+frames ahead of the frame currently being displayed.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<p id="section-3.1-5">Another reason that it is good not to permit an
 excessive amount of unsent data to be queued up
 is that once data is committed to a buffer,
 there are generally limited options for changing it.
@@ -1394,33 +1405,33 @@ on balance it is simpler simply to avoid committing
 too much unsent data to the buffer in the first place.
 If the backlog of unsent data is kept reasonably low,
 that gives the source more flexibility decide what to
-put into the buffer next, when that opportunity arises.<a href="#section-4-5" class="pilcrow">¶</a></p>
-<p id="section-4-6">In summary, in order to give applications maximum
+put into the buffer next, when that opportunity arises.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
+<p id="section-3.1-6">In summary, in order to give applications maximum
 flexibility, pending data should be kept as close
 to the application for as long as possible.
 Application buffers should be as large as needed
 for the application to do its work,
 and lower-layer buffers should be no larger than
 is necessary to provide efficient use of available
-network capacity and other resources like CPU time.<a href="#section-4-6" class="pilcrow">¶</a></p>
+network capacity and other resources like CPU time.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="indirect-backpressure">
-<section id="section-5">
-      <h2 id="name-indirect-backpressure">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-indirect-backpressure" class="section-name selfRef">Indirect Backpressure</a>
-      </h2>
-<p id="section-5-1">All of the situations described above using “direct backpressure”
+<section id="section-3.2">
+        <h3 id="name-indirect-backpressure">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-indirect-backpressure" class="section-name selfRef">Indirect Backpressure</a>
+        </h3>
+<p id="section-3.2-1">All of the situations described above using “direct backpressure”
 are one-hop communication where the CPU generating the data
 is connected more-or-less directly to the device receiving the data.
 In these cases it is relatively simple for the receiving device
-to exert backpressure to influence the rate at which the CPU sends data.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">When we introduce multi-hop networking,
+to exert backpressure to influence the rate at which the CPU sends data.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">When we introduce multi-hop networking,
 the situation becomes more complicated.
 When a flow of packets travels 30 hops though
 a network, the bottleneck hop may be quite distant
-from the original source of the data stream.<a href="#section-5-2" class="pilcrow">¶</a></p>
-<p id="section-5-3">For example, when a cable modem
+from the original source of the data stream.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-3">For example, when a cable modem
 with a 35Mb/s output rate receives
 an excessive flow of packets coming in
 on its Gb/s Ethernet interface,
@@ -1430,10 +1441,10 @@ The cable modem’s choices are limited to
 enqueueing an incoming packet,
 discarding an incoming packet,
 or enqueueing an incoming packet and
-marking it with an ECN CE mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">The reasons the cable modem’s choices are so limited
-are because of security and packet size constraints.<a href="#section-5-4" class="pilcrow">¶</a></p>
-<p id="section-5-5">Security and trust concerns revolve around preventing a
+marking it with an ECN CE mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">The reasons the cable modem’s choices are so limited
+are because of security and packet size constraints.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-5">Security and trust concerns revolve around preventing a
 malicious entity from performing a denial-of-service attack
 against a victim device by sending fraudulent messages that
 would cause it to reduce its transmission rate.
@@ -1449,8 +1460,8 @@ increase security concerns, since these devices could already
 perform more malicious actions anyway. The sender already
 trusts the receiver to generate accurate acknowledgement
 packets, so also trusting it to report ECN information back
-to the sender does not increase the security risk.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">A consequence of this security requirement is that it takes a
+to the sender does not increase the security risk.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
+<p id="section-3.2-6">A consequence of this security requirement is that it takes a
 full round trip time for the source to learn about queue state
 in the network. In many common cases this is not a significant
 deficiency. For example, if a user is receiving data from a
@@ -1459,8 +1470,8 @@ bottleneck is the last hop on the path (e.g., the Wi-Fi hop to
 the user’s smartphone in their home) then the location where
 the queue is building up (the Wi-Fi Access Point) is very close
 to the receiver, and having the receiver echo the queue state
-information back to the sender does not add significant delay.<a href="#section-5-6" class="pilcrow">¶</a></p>
-<p id="section-5-7">Packet size constraints, particularly scarce bits available
+information back to the sender does not add significant delay.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">Packet size constraints, particularly scarce bits available
 in the IP header, mean that for pragmatic reasons the ECN
 queue size feedback is limited to two states: “The source
 may try sending a little faster if desired,” and, “The
@@ -1468,8 +1479,8 @@ source should reduce its sending rate.” Use of these
 increase/decrease indications in successive packets allows
 the sender to converge on the ideal transmission rate, and
 then to oscillate slightly around the ideal transmission
-rate as it continues to track changing network conditions.<a href="#section-5-7" class="pilcrow">¶</a></p>
-<p id="section-5-8">Discarding or marking an incoming packet
+rate as it continues to track changing network conditions.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.2-8">Discarding or marking an incoming packet
 at some point within the network are
 what we refer to as indirect backpressure,
 with the assumption that these actions will eventually
@@ -1478,23 +1489,25 @@ via having a write call blocked,
 returning an EWOULDBLOCK error,
 or some other form of backpressure that
 causes the source application
-to temporarily pause sending new data.<a href="#section-5-8" class="pilcrow">¶</a></p>
+to temporarily pause sending new data.<a href="#section-3.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="case-study-tcpnotsentlowat">
-<section id="section-6">
+</section>
+</div>
+<div id="casestudy">
+<section id="section-4">
       <h2 id="name-case-study-tcp_notsent_lowa">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-case-study-tcp_notsent_lowa" class="section-name selfRef">Case Study -- TCP_NOTSENT_LOWAT</a>
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-case-study-tcp_notsent_lowa" class="section-name selfRef">Case Study -- TCP_NOTSENT_LOWAT</a>
       </h2>
-<p id="section-6-1">In April 2011 the author was investigating
+<p id="section-4-1">In April 2011 the author was investigating
 sluggishness with Mac OS Screen Sharing,
 which uses the VNC Remote Framebuffer (RFB) protocol <span>[<a href="#RFC6143" class="cite xref">RFC6143</a>]</span>.
 Initially it seemed like a classic case of network bufferbloat.
 However, deeper investigation revealed that in this case
 the network was not responsible for the excessive delay --
 the excessive delay was being caused by
-excessive buffering on the sending device itself.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">In this case the network connection was a relatively slow
+excessive buffering on the sending device itself.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<p id="section-4-2">In this case the network connection was a relatively slow
 DSL line (running at about 500 kb/s) and
 the socket send buffer (SO_SNDBUF) was set to 128 kilobytes.
 With a 50 ms round-trip time,
@@ -1509,8 +1522,8 @@ before it even left the source machine.
 Clearly, delaying every sent byte by two seconds
 resulted in a very sluggish screen sharing experience,
 and it did not yield any useful benefit like
-higher throughput or lower CPU utilization.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">This led to the creation in May 2011
+higher throughput or lower CPU utilization.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">This led to the creation in May 2011
 of a new socket option on Mac OS and iOS
 called “TCP_NOTSENT_LOWAT”.
 This new socket option provided the ability for
@@ -1535,8 +1548,8 @@ Too much unsent data waiting to go out
 might soon be able to send --
 is harmful for delay-sensitive applications
 because it increases delay without
-meaningfully increasing throughput or utilization.<a href="#section-6-3" class="pilcrow">¶</a></p>
-<p id="section-6-4">Empirically it was found that setting an
+meaningfully increasing throughput or utilization.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">Empirically it was found that setting an
 unsent data low-water-mark threshold of 16 kilobytes
 worked well for VNC RFB screen sharing.
 When the amount of unsent data fell below this
@@ -1556,25 +1569,25 @@ and not inadvertently get multiple frames ahead.
 This provided enough unsent data waiting to go out
 to fully utilize the capacity of the path,
 without buffering so much unsent data
-that it adversely affected usability.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">A live on-stage demo showing the benefits of using TCP_NOTSENT_LOWAT
+that it adversely affected usability.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<p id="section-4-5">A live on-stage demo showing the benefits of using TCP_NOTSENT_LOWAT
 with VNC RFB screen sharing was shown at the
-Apple Worldwide Developer Conference in June 2015 <span>[<a href="#Demo" class="cite xref">Demo</a>]</span>.<a href="#section-6-5" class="pilcrow">¶</a></p>
+Apple Worldwide Developer Conference in June 2015 <span>[<a href="#Demo" class="cite xref">Demo</a>]</span>.<a href="#section-4-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="shortcomings-of-tcpnotsentlowat">
-<section id="section-7">
+<section id="section-5">
       <h2 id="name-shortcomings-of-tcp_notsent">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-shortcomings-of-tcp_notsent" class="section-name selfRef">Shortcomings of TCP_NOTSENT_LOWAT</a>
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-shortcomings-of-tcp_notsent" class="section-name selfRef">Shortcomings of TCP_NOTSENT_LOWAT</a>
       </h2>
-<p id="section-7-1">While TCP_NOTSENT_LOWAT achieved its initial intended goal,
-later operational experience has revealed some shortcomings.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">While TCP_NOTSENT_LOWAT achieved its initial intended goal,
+later operational experience has revealed some shortcomings.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <div id="platform-differences">
-<section id="section-7.1">
+<section id="section-5.1">
         <h3 id="name-platform-differences">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-platform-differences" class="section-name selfRef">Platform Differences</a>
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-platform-differences" class="section-name selfRef">Platform Differences</a>
         </h3>
-<p id="section-7.1-1">The Linux network maintainers implemented a TCP
+<p id="section-5.1-1">The Linux network maintainers implemented a TCP
 socket option with the same name, but different behavior.
 While the Apple version of TCP_NOTSENT_LOWAT was
 focussed on reducing delay,
@@ -1588,15 +1601,15 @@ even if it has data prepared and ready to enqueue.
 Setting TCP_NOTSENT_LOWAT to 16 kilobytes works well on Apple
 systems, but can severely limit throughput on Linux systems.
 This has led to confusion among developers and makes it difficult
-to write portable code that works on both platforms.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+to write portable code that works on both platforms.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="time-versus-bytes">
-<section id="section-7.2">
+<section id="section-5.2">
         <h3 id="name-time-versus-bytes">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-time-versus-bytes" class="section-name selfRef">Time Versus Bytes</a>
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-time-versus-bytes" class="section-name selfRef">Time versus Bytes</a>
         </h3>
-<p id="section-7.2-1">The original thinking on TCP_NOTSENT_LOWAT focussed on
+<p id="section-5.2-1">The original thinking on TCP_NOTSENT_LOWAT focussed on
 the number of unsent bytes remaining, but it soon became
 clear that the relevant quantity was time, not bytes.
 The quantity of interest to the sending application
@@ -1616,8 +1629,8 @@ It became clear that it would be more useful for the
 sending application specify how much advance notice
 of data exhaustion it required (in milliseconds, or microseconds),
 depending on how much time the application anticipated
-needing to generate its next logical block of data.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">The application could perform this calculation itself,
+needing to generate its next logical block of data.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-2">The application could perform this calculation itself,
 calculating the estimated current data rate and dividing
 that by its desired advance notice time, to compute the number
 of outstanding unsent bytes corresponding to that desired time.
@@ -1626,26 +1639,26 @@ TCP_NOTSENT_LOWAT value as the observed data rate changed.
 Since the transport protocol already knows the number of
 unacknowledged bytes in flight, and the current round-trip delay,
 the transport protocol is in a better position
-to perform this calculation.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-<p id="section-7.2-3">In addition, the network stack knows if features like hardware
+to perform this calculation.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
+<p id="section-5.2-3">In addition, the network stack knows if features like hardware
 offload, aggregation, and stretch acks are being used,
-which could impact the burstiness of consumption of unsent bytes.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">Wi-Fi interfaces perform better when they send
+which could impact the burstiness of consumption of unsent bytes.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-5.2-4">Wi-Fi interfaces perform better when they send
 batches of packets aggregated together instead of
 sending individual packets one at a time.
 The amount of aggregation that is desirable depends
 on the current wireless conditions,
 so the Wi-Fi interface and its driver
-are in the best position to determine that.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
-<p id="section-7.2-5">If stretch acks are being used, then each ack packet
+are in the best position to determine that.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
+<p id="section-5.2-5">If stretch acks are being used, then each ack packet
 could acknowledge 8 data segments, or about 12 kilobytes.
 If one such ack packet is lost, the following ack packet
 will cumulatively acknowledge 24 kilobytes,
 instantly consuming the entire 16 kilobyte unsent backlog,
 and giving the application no advance notice that
 the transport protocol is suddenly out of available data to send,
-and some network capacity becomes wasted.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
-<p id="section-7.2-6">Occasional failures to fully utilize the entire
+and some network capacity becomes wasted.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2-6">Occasional failures to fully utilize the entire
 available network capacity are not a disaster, but we
 still would like to avoid this being a common occurrence.
 Therefore it is better to have the transport protocol,
@@ -1656,44 +1669,44 @@ given the current network conditions
 and current amount of unsent data.
 When the estimated time remaining until exhaustion falls
 below the application’s specified threshold, the application
-is notified to begin working on generating more data.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+is notified to begin working on generating more data.<a href="#section-5.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="other-transport-protocols">
-<section id="section-7.3">
+<section id="section-5.3">
         <h3 id="name-other-transport-protocols">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-other-transport-protocols" class="section-name selfRef">Other Transport Protocols</a>
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-other-transport-protocols" class="section-name selfRef">Other Transport Protocols</a>
         </h3>
-<p id="section-7.3-1">TCP_NOTSENT_LOWAT was initially defined only for TCP,
+<p id="section-5.3-1">TCP_NOTSENT_LOWAT was initially defined only for TCP,
 and only for the BSD Sockets programming interface.
 It would be useful to define equivalent delay management
 capabilities for other transport protocols, like QUIC,
-and for other network programming APIs.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+and for other network programming APIs.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="tcpreplenishtime">
-<section id="section-8">
+<section id="section-6">
       <h2 id="name-tcp_replenish_time">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-tcp_replenish_time" class="section-name selfRef">TCP_REPLENISH_TIME</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-tcp_replenish_time" class="section-name selfRef">TCP_REPLENISH_TIME</a>
       </h2>
-<p id="section-8-1">Because of these lessons learned, this document proposes
-a new BSD Socket option for TCP, TCP_REPLENISH_TIME.<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">The new TCP_REPLENISH_TIME socket option specifies the
+<p id="section-6-1">Because of these lessons learned, this document proposes
+a new BSD Socket option for TCP, TCP_REPLENISH_TIME.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">The new TCP_REPLENISH_TIME socket option specifies the
 threshold for notifying an application of impending data
 exhaustion in terms of microseconds, not bytes.
 It is the job of the transport protocol to compute its
 best estimate of when the amount of remaining unsent data
-falls below this threshold.<a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">The new TCP_REPLENISH_TIME socket option
+falls below this threshold.<a href="#section-6-2" class="pilcrow">¶</a></p>
+<p id="section-6-3">The new TCP_REPLENISH_TIME socket option
 should have the same semantics across all
-operating systems and network stack implementations.<a href="#section-8-3" class="pilcrow">¶</a></p>
-<p id="section-8-4">Other transport protocols, like QUIC,
+operating systems and network stack implementations.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-4">Other transport protocols, like QUIC,
 and other network APIs not based on BSD Sockets,
 should provide equivalent time-based backlog-management
-mechanisms, as appropriate to their API design.<a href="#section-8-4" class="pilcrow">¶</a></p>
-<p id="section-8-5">The time-based estimate does not need to be perfectly accurate,
+mechanisms, as appropriate to their API design.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">The time-based estimate does not need to be perfectly accurate,
 either on the part of the transport protocol estimating how much
 time remains before the backlog of unsent data is exhausted,
 or on the part of the application estimating how much
@@ -1713,21 +1726,21 @@ For a delay-sensitive application, having some reasonable
 mechanism to avoid an excessive backlog of unsent data is
 dramatically better than having no such mechanism at all.
 Occasional overestimates or underestimates do not
-negate the benefit of this capability.<a href="#section-8-5" class="pilcrow">¶</a></p>
+negate the benefit of this capability.<a href="#section-6-5" class="pilcrow">¶</a></p>
 <div id="solicitation-for-name-suggestions">
-<section id="section-8.1">
+<section id="section-6.1">
         <h3 id="name-solicitation-for-name-sugge">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-solicitation-for-name-sugge" class="section-name selfRef">Solicitation for Name Suggestions</a>
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-solicitation-for-name-sugge" class="section-name selfRef">Solicitation for Name Suggestions</a>
         </h3>
-<p id="section-8.1-1">Author’s note: The BSD socket option name “TCP_REPLENISH_TIME”
+<p id="section-6.1-1">Author’s note: The BSD socket option name “TCP_REPLENISH_TIME”
 is currently proposed as a working name
 for this new option for BSD Sockets.
 While the name does not affect the behavior of the code,
 the choice of name is important, because people often
 form their first impressions of a concept based on its name,
 and if they form incorrect first impressions then their
-thinking about the concept may be adversely affected.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">For example, the BSD socket option could be called
+thinking about the concept may be adversely affected.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">For example, the BSD socket option could be called
 “TCP_REPLENISH_TIME” or “TCP_EXHAUSTION_TIME”.
 These are two sides of the same coin.
 From the application’s point of view, it is expressing
@@ -1739,19 +1752,24 @@ REPLENISH_TIME == EXHAUSTION_TIME, so that the data is
 replenished at exactly the moment the networking code needs it.
 In a sense, they are two ways of saying the same thing.
 Since this API call is made by the application, we feel it
-should be expressed in terms of the application’s requirement.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
+should be expressed in terms of the application’s requirement.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="applicability">
-<section id="section-9">
+<section id="section-7">
       <h2 id="name-applicability">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-applicability" class="section-name selfRef">Applicability</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-applicability" class="section-name selfRef">Applicability</a>
       </h2>
-<p id="section-9-1">This time-based backlog management is applicable anywhere
-that a queue of unsent data may build up on the sending device.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<p id="section-9-2">Since multi-hop network protocols already implement
+<p id="section-7-1">This time-based backlog management is applicable anywhere
+that a queue of unsent data may build up on the sending device.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<div id="physical-bottlenecks">
+<section id="section-7.1">
+        <h3 id="name-physical-bottlenecks">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-physical-bottlenecks" class="section-name selfRef">Physical Bottlenecks</a>
+        </h3>
+<p id="section-7.1-1">Since multi-hop network protocols already implement
 indirect backpressure in the form of discarding or marking packets,
 it can be tempting to use this mechanism
 for the first hop of the path too.
@@ -1765,22 +1783,22 @@ is a crude rate-control signal, because it takes a full network
 round-trip time before the effect of that drop or mark is
 observed at the receiver and echoed back to the sender, and
 it may take multiple such round trips before it finally
-results in an appropriate reduction in sending rate.<a href="#section-9-2" class="pilcrow">¶</a></p>
-<p id="section-9-3">In contrast to queue buildup in the network,
+results in an appropriate reduction in sending rate.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">In contrast to queue buildup in the network,
 queue buildup at the sending device has different properties
 regarding (i) security, (ii) packet size constraints, and (iii) immediacy.
 This means that when it is the source device itself
 that is building up a backlog of unsent data,
-designers of networking software have more freedom about how to manage this.<a href="#section-9-3" class="pilcrow">¶</a></p>
-<p id="section-9-4">(i) When the source of the data and the location of the backlog are
-the same physical device, network security and trust concerns do not apply.<a href="#section-9-4" class="pilcrow">¶</a></p>
-<p id="section-9-5">(ii) When the mechanism we use to communicate about queue state
+designers of networking software have more freedom about how to manage this.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">(i) When the source of the data and the location of the backlog are
+the same physical device, network security and trust concerns do not apply.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">(ii) When the mechanism we use to communicate about queue state
 is a software API instead of packets sent though a network,
 we do not have the constraint of having to work within
-limited IP packet header space.<a href="#section-9-5" class="pilcrow">¶</a></p>
-<p id="section-9-6">(iii) When flow control is implemented via a local software API,
-the delivery of STOP/GO information to the source is immediate.<a href="#section-9-6" class="pilcrow">¶</a></p>
-<p id="section-9-7">Direct backpressure can be achieved
+limited IP packet header space.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-5">(iii) When flow control is implemented via a local software API,
+the delivery of STOP/GO information to the source is immediate.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+<p id="section-7.1-6">Direct backpressure can be achieved
 simply making an API call block,
 or by returning a Unix EWOULDBLOCK error,
 or using equivalent mechanisms in other APIs,
@@ -1789,10 +1807,10 @@ Similarly, when the system becomes able to accept more data,
 unblocking an API call, indicating that a socket
 has become writable using select() or kevent(),
 or equivalent mechanisms in other APIs,
-has the effect of immediately allowing the production of more data.<a href="#section-9-7" class="pilcrow">¶</a></p>
-<p id="section-9-8">Where direct backpressure mechanisms are possible they
-should be preferred over indirect backpressure mechanisms.<a href="#section-9-8" class="pilcrow">¶</a></p>
-<p id="section-9-9">If the outgoing network interface on the source device
+has the effect of immediately allowing the production of more data.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
+<p id="section-7.1-7">Where direct backpressure mechanisms are possible they
+should be preferred over indirect backpressure mechanisms.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
+<p id="section-7.1-8">If the outgoing network interface on the source device
 is the slowest hop of a multi-hop network path, then this
 is where the backlog of unsent data will accumulate.
 This is often the case when a user has symmetric
@@ -1806,20 +1824,27 @@ the upgrade causes the bottleneck hop to change location,
 from the Internet gateway
 (which may have good queue mangement using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>)
 to the Wi-Fi-connected device,
-which may have very poor source buffer management.<a href="#section-9-9" class="pilcrow">¶</a></p>
-<p id="section-9-10">In addition to physical bottlenecks,
-devices also have intentional algorithmic bottlenecks:<a href="#section-9-10" class="pilcrow">¶</a></p>
+which may have very poor source buffer management.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="algorithmic-bottlenecks">
+<section id="section-7.2">
+        <h3 id="name-algorithmic-bottlenecks">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-algorithmic-bottlenecks" class="section-name selfRef">Algorithmic Bottlenecks</a>
+        </h3>
+<p id="section-7.2-1">In addition to physical bottlenecks,
+devices also have intentional algorithmic bottlenecks:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9-11.1">
-          <p id="section-9-11.1.1">If the TCP receive window is full, then the sending TCP
+<li class="normal" id="section-7.2-2.1">
+            <p id="section-7.2-2.1.1">If the TCP receive window is full, then the sending TCP
 implementation will voluntarily refrain from sending new data,
 even though the device’s outgoing first-hop interface is easily
 capable of sending those packets.
 This is vital to avoid overrunning the receiver with data
-faster than it can process it.<a href="#section-9-11.1.1" class="pilcrow">¶</a></p>
+faster than it can process it.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-9-11.2">
-          <p id="section-9-11.2.1">The transport protocol’s rate management (congestion control) algorithm
+          <li class="normal" id="section-7.2-2.2">
+            <p id="section-7.2-2.2.1">The transport protocol’s rate management (congestion control) algorithm
 may determine that it should delay before sending more data, so as
 not to overflow a queue at some other bottleneck within the network.
 This is vital to avoid overrunning the capacity of the bottleneck
@@ -1827,36 +1852,43 @@ network hop with data faster than it can forward it,
 resulting in massive packet loss,
 which would equate to a large wastage of resources at the sender,
 in the form of battery power and network capacity wasted by
-generating packets that will not make it to the receiver.<a href="#section-9-11.2.1" class="pilcrow">¶</a></p>
+generating packets that will not make it to the receiver.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-9-11.3">
-          <p id="section-9-11.3.1">When packet pacing is being used, the sending network
+          <li class="normal" id="section-7.2-2.3">
+            <p id="section-7.2-2.3.1">When packet pacing is being used, the sending network
 implementation may choose voluntarily to moderate the rate at
 which it emits packets, so as to smooth the flow of packets into
 the network, even though the device’s outgoing first-hop interface
 might be easily capable of sending at a much higher rate.
 When packet pacing is being used, a temporary backlog
 can build up at this layer if the source is generating
-data faster than the pacing rate.<a href="#section-9-11.3.1" class="pilcrow">¶</a></p>
+data faster than the pacing rate.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
-      </ul>
-<p id="section-9-12">Whether the source application is constrained
+        </ul>
+<p id="section-7.2-3">Whether the source application is constrained
 by a physical bottleneck on the sending device, or
 by an algorithmic bottleneck on the sending device,
-the benefits of not overcommitting data to the outgoing buffer are similar.<a href="#section-9-12" class="pilcrow">¶</a></p>
-<p id="section-9-13">As described in the introduction,
+the benefits of not overcommitting data to the outgoing buffer are similar.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">As described in the introduction,
 the goal is for the application software to be able to
 write chunks of data large enough to be efficient,
 without writing too many of them too quickly,
-and causing unwanted self-inflicted delay.<a href="#section-9-13" class="pilcrow">¶</a></p>
-<p id="section-9-14">It is important to understand that these
+and causing unwanted self-inflicted delay.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="application-programming-interface">
+<section id="section-7.3">
+        <h3 id="name-application-programming-int">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-application-programming-int" class="section-name selfRef">Application Programming Interface</a>
+        </h3>
+<p id="section-7.3-1">It is important to understand that these
 backpressure mechanisms at the API layer are not new.
 They have existed by necessity for as long as we have had
 networking APIs (or serial port APIs or file system APIs).
 The only difference here is that historically
 these backpressure mechanisms were exercised too late,
-after an excessive backlog had already built up.<a href="#section-9-14" class="pilcrow">¶</a></p>
-<p id="section-9-15">The proposal in this Source Buffer Management
+after an excessive backlog had already built up.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">The proposal in this Source Buffer Management
 document is not to define entirely new API mechanisms
 that did not previously exist, or to fundamentally
 change how networking applications are written;
@@ -1869,22 +1901,22 @@ it may be that the only change the application
 needs is to use TCP_REPLENISH_TIME to indicate
 its expected time budget to generate a new block
 of data, and everything else in the application
-remains completely unchanged.<a href="#section-9-15" class="pilcrow">¶</a></p>
+remains completely unchanged.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="bulk-transfer-protocols">
-<section id="section-10">
-      <h2 id="name-bulk-transfer-protocols">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
-      </h2>
-<p id="section-10-1">It is frequently asserted that latency matters primarily for
+<section id="section-7.4">
+        <h3 id="name-bulk-transfer-protocols">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
+        </h3>
+<p id="section-7.4-1">It is frequently asserted that latency matters primarily for
 interactive applications like video conferencing and on-line games,
-and latency is relatively unimportant for most other applications.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">We do not agree with this characterization.<a href="#section-10-2" class="pilcrow">¶</a></p>
-<p id="section-10-3">Even for large bulk data transfers
+and latency is relatively unimportant for most other applications.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">We do not agree with this characterization.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
+<p id="section-7.4-3">Even for large bulk data transfers
 -- e.g., downloading a software update or uploading a video --
-we believe latency affects performance.<a href="#section-10-3" class="pilcrow">¶</a></p>
-<p id="section-10-4">For example, TCP fast retransmit can immediately
+we believe latency affects performance.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+<p id="section-7.4-4">For example, TCP fast retransmit can immediately
 recover a single lost packet in a single round-trip time.
 TCP generally performs at its absolute best when the
 loss rate is no more than one loss per round-trip time.
@@ -1905,25 +1937,27 @@ A transport protocol cannot make rate adaptation changes
 to adjust to varying network conditions in less than one
 network round-trip time, so the higher the total network
 round-trip time is, the less agile the transport protocol
-is at adjusting to varying network conditions.<a href="#section-10-4" class="pilcrow">¶</a></p>
-<p id="section-10-5">In short, a client running over a transport protocol like TCP
+is at adjusting to varying network conditions.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
+<p id="section-7.4-5">In short, a client running over a transport protocol like TCP
 may itself not be a real-time delay-sensitive application,
 but a transport protocol itself is most definitely a
 delay-sensitive application, responding in real time
-to changing network conditions.<a href="#section-10-5" class="pilcrow">¶</a></p>
+to changing network conditions.<a href="#section-7.4-5" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="alternative-proposals">
-<section id="section-11">
+<section id="section-8">
       <h2 id="name-alternative-proposals">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-alternative-proposals" class="section-name selfRef">Alternative Proposals</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-alternative-proposals" class="section-name selfRef">Alternative Proposals</a>
       </h2>
 <div id="just-use-udp">
-<section id="section-11.1">
+<section id="section-8.1">
         <h3 id="name-just-use-udp">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-just-use-udp" class="section-name selfRef">Just use UDP</a>
+<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-just-use-udp" class="section-name selfRef">Just use UDP</a>
         </h3>
-<p id="section-11.1-1">Because much of the discussion about network latency involves
+<p id="section-8.1-1">Because much of the discussion about network latency involves
 talking about the behavior of transport protocols like TCP,
 sometimes people conclude that TCP is the problem,
 and think that using UDP will solve the source buffering problem.
@@ -1931,34 +1965,34 @@ It does no such thing.
 If an application sends UDP packets faster than the outgoing
 network interface can carry them, then a queue of packets
 will still build up, causing increasing delay for those packets,
-and eventual packet loss when the queue reaches its capacity.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<p id="section-11.1-2">Any protocol that runs over UDP (like QUIC) must end up
+and eventual packet loss when the queue reaches its capacity.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-2">Any protocol that runs over UDP (like QUIC) must end up
 re-creating the same rate adaptation behaviors that are
 already built into TCP, or it will fail to operate
-gracefully over a range of different network conditions.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
+gracefully over a range of different network conditions.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="packet-expiration">
-<section id="section-11.2">
+<section id="section-8.2">
         <h3 id="name-packet-expiration">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-packet-expiration" class="section-name selfRef">Packet Expiration</a>
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-packet-expiration" class="section-name selfRef">Packet Expiration</a>
         </h3>
-<p id="section-11.2-1">One approach that is sometimes used, is to send packets
+<p id="section-8.2-1">One approach that is sometimes used, is to send packets
 tagged with an expiration time, and if they have spent
 too long waiting in the outgoing queue then they are
 automatically discarded without even being sent.
 This is counterproductive because the sending application
 does all the work to generate data, and then has to do more
 work to recover from the self-inflicted data loss caused by
-the expiration time.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
-<p id="section-11.2-2">If the outgoing queue is kept short, then the
+the expiration time.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-2">If the outgoing queue is kept short, then the
 amount of unwanted delay is kept correspondingly short.
 In addition, if there is only a small amount of data in the
 outgoing queue, then the cost of sending a small amount of
 data that may arguably have become stale is also small --
 usually smaller than the cost of having to recover missing
-state caused by intentional discard of that delayed data.<a href="#section-11.2-2" class="pilcrow">¶</a></p>
-<p id="section-11.2-3">For example, in video conferencing applications it is
+state caused by intentional discard of that delayed data.<a href="#section-8.2-2" class="pilcrow">¶</a></p>
+<p id="section-8.2-3">For example, in video conferencing applications it is
 frequently thought that if a frame is delayed past the
 point where it becomes too late to display it, then it becomes
 a waste of network capacity to send that frame at all.
@@ -1980,15 +2014,15 @@ to simply send the delayed frame.
 Just because a frame arrives too late to be displayed does
 not mean that the data within that frame is not important.
 The data contained with a frame is used not only to display
-that frame, but also in the construction of subsequent frames.<a href="#section-11.2-3" class="pilcrow">¶</a></p>
+that frame, but also in the construction of subsequent frames.<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="head-of-line-blocking-traffic-priorities">
-<section id="section-11.3">
+<section id="section-8.3">
         <h3 id="name-head-of-line-blocking-traff">
-<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-head-of-line-blocking-traff" class="section-name selfRef">Head of Line Blocking / Traffic Priorities</a>
+<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-head-of-line-blocking-traff" class="section-name selfRef">Head of Line Blocking / Traffic Priorities</a>
         </h3>
-<p id="section-11.3-1">People are often very concerned about the problem of
+<p id="section-8.3-1">People are often very concerned about the problem of
 head-of-line-blocking, and propose to solve it using
 techniques such as packet priorities,
 and the ability cancel unsent pending messages <span>[<a href="#MMADAPT" class="cite xref">MMADAPT</a>]</span>.
@@ -2000,37 +2034,37 @@ and prioritize and manage that obligatory excessive queue.
 In contrast, if we take steps to keep queues short,
 the problems head-of-line-blocking largely go away.
 When the line is consistently short, being at the back of
-the line is no longer the serious problem that it used to be.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+the line is no longer the serious problem that it used to be.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-12">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-12-1">No security concerns are anticipated resulting from reducing
-the amount of stale data sitting in buffers at the sender.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-9-1">No security concerns are anticipated resulting from reducing
+the amount of stale data sitting in buffers at the sender.<a href="#section-9-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-13">
+<section id="section-10">
       <h2 id="name-iana-considerations">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-13-1">This document has no IANA actions.<a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-10-1">This document has no IANA actions.<a href="#section-10-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-14">
+<section id="section-11">
       <h2 id="name-references">
-<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-14.1">
+<section id="section-11.1">
         <h3 id="name-normative-references">
-<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="RFC2119">[RFC2119]</dt>
@@ -2045,9 +2079,9 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-12-1
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-14.2">
+<section id="section-11.2">
         <h3 id="name-informative-references">
-<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="Bloat1">[Bloat1]</dt>
