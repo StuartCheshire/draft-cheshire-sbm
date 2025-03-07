@@ -783,6 +783,25 @@ its expected time budget to generate a new block
 of data, and everything else in the application
 remains completely unchanged.
 
+## Relationship Between Throughput and Delay
+
+Is is important to understand that Source Buffer Management
+using TCP\_REPLENISH\_TIME does not alter the overall
+long-term average throughput of a data transfer.
+Calculating the optimum rate to send data
+(so as not to exceed receiver’s capacity,
+or the available network capacity)
+remains the responsibility of the transport protocol.
+Using TCP\_REPLENISH\_TIME does not alter the data rate;
+it alters the time delay between when data generated
+and when that data departs the sending device.
+Using the example from {{casestudy}}, in both cases
+the long-term average throughput was 500 kb/s.
+What changed was that originally the application was
+generating 500 kb/s with two seconds of outgoing delay;
+after using TCP\_REPLENISH\_TIME the application was
+generating 500 kb/s with 250 milliseconds of outgoing delay;
+
 ## Bulk Transfer Protocols
 
 It is frequently asserted that latency matters primarily for
