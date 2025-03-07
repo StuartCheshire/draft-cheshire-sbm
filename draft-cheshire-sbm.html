@@ -1434,17 +1434,33 @@ the situation becomes more complicated.
 When a flow of packets travels 30 hops though
 a network, the bottleneck hop may be quite distant
 from the original source of the data stream.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2-3">For example, when a cable modem
-with a 35Mb/s output rate receives
-an excessive flow of packets coming in
-on its Gb/s Ethernet interface,
-the cable modem cannot directly cause
-the sending application to block or receive an EWOULDBLOCK error.
-The cable modem’s choices are limited to
-enqueueing an incoming packet,
-discarding an incoming packet,
-or enqueueing an incoming packet and
-marking it with an ECN CE mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-3">For example, consider the case of
+a smartphone communicating via a Wi-Fi Access Point at 600 Mb/s,
+which is connected to a home NAT gateway via gigabit Ethernet,
+which is connected to a cable modem via gigabit Ethernet,
+which has an upstream output rate of 35Mb/s over the coaxial cable.
+When the cable modem experiences
+an excessive flow of incoming packets arriving
+on its gigabit Ethernet interface,
+the cable modem has no direct way to cause
+the networking code on the smartphone to curtail
+the influx of data by pausing the sending application
+via blocking its write calls or delivering EWOULDBLOCK errors.
+The source of the excessive flood of data
+causing the problem (the smartphone)
+is three network hops away from the device
+experiencing the problem (the cable modem).
+When an incoming packet arrives,
+the cable modem’s choices are limited to
+enqueueing the packet,
+discarding the packet,
+or enqueueing the packet and
+marking it with an ECN CE mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.
+The cable modem drops or marks an incoming packet
+in the expectation that this will, eventually,
+indirectly, cause the networking code and operating system
+on the sending device to take the necessary steps
+to curtail the sending application.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
 <p id="section-3.2-4">The reasons the cable modem’s choices are so limited
 are because of security and packet size constraints.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 <p id="section-3.2-5">Security and trust concerns revolve around preventing a
