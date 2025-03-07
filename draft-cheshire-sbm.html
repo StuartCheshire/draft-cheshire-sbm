@@ -1209,10 +1209,13 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
                 <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-algorithmic-bottlenecks" class="internal xref">Algorithmic Bottlenecks</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-application-programming-int" class="internal xref">Application Programming Interface</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-superiority-of-direct-backp" class="internal xref">Superiority of Direct Backpressure</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-application-programming-int" class="internal xref">Application Programming Interface</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
 </li>
             </ul>
 </li>
@@ -1769,10 +1772,110 @@ that a queue of unsent data may build up on the sending device.<a href="#section
         <h3 id="name-physical-bottlenecks">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-physical-bottlenecks" class="section-name selfRef">Physical Bottlenecks</a>
         </h3>
-<p id="section-7.1-1">Since multi-hop network protocols already implement
+<p id="section-7.1-1">A backlog may build up on the sending device if the source
+of the packets is simply generating them faster than
+the outgoing first-hop interface is able to send them.
+This will cause a queue to build up in the network
+hardware or its associated driver.
+In this case,
+to avoid packets suffering excessive queueing delay,
+the hardware or its driver
+needs to communicate backpressure to IP, which
+needs to communicate backpressure to
+the transport protocol (TCP or QUIC), which
+needs to communicate backpressure to
+the application that is the source of the data.
+We refer to this case as a physical bottleneck.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-7.1-2">For an example of a physical bottleneck,
+consider the case when a user has symmetric
+1Gb/s Internet service,
+and they are sending data from a device
+communicating via Wi-Fi at a lower rate, say 300 Mb/s.
+In this case (assuming it is communicating with a
+well-connected server on the Internet) the sending
+device’s Wi-Fi interface is the limiting factor.
+If the Wi-Fi hardware, driver, and networking software
+does not produce appropriate backpressure, then outgoing
+network traffic will experience increasing delays.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">Poor backpressure from first-hop physical bottlenecks
+can produce the ironic outcome that upgrading
+home Internet service from 100Mb/s to 1Gb/s can sometimes
+result in a customer getting a worse user experience,
+because the upgrade causes the bottleneck hop to change location,
+from the Internet gateway
+(which may have good queue mangement using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>)
+to the source device’s Wi-Fi interface,
+which may have very poor source buffer management.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="algorithmic-bottlenecks">
+<section id="section-7.2">
+        <h3 id="name-algorithmic-bottlenecks">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-algorithmic-bottlenecks" class="section-name selfRef">Algorithmic Bottlenecks</a>
+        </h3>
+<p id="section-7.2-1">In addition to physical bottlenecks,
+there are other reasons why software on the sending
+device may choose to refrain from sending data as fast
+as the outgoing first-hop interface can carry it.
+We refer to these as algorithmic bottlenecks.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2">In the case study in <a href="#casestudy" class="auto internal xref">Section 4</a>, the bottleneck was the
+transport protocol’s rate management (congestion control) algorithm,
+not a physical constraint of the outgoing first-hop interface
+(which was gigabit Ethernet).<a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7.2-3.1">
+            <p id="section-7.2-3.1.1">If the TCP receive window is full, then the sending TCP
+implementation will voluntarily refrain from sending new data,
+even though the device’s outgoing first-hop interface is easily
+capable of sending those packets.
+This is vital to avoid overrunning the receiver with data
+faster than it can process it.<a href="#section-7.2-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.2">
+            <p id="section-7.2-3.2.1">The transport protocol’s rate management (congestion control) algorithm
+may determine that it should delay before sending more data, so as
+not to overflow a queue at some other bottleneck within the network.
+This is vital to avoid overrunning the capacity of the bottleneck
+network hop with data faster than it can forward it,
+resulting in massive packet loss,
+which would equate to a large wastage of resources at the sender,
+in the form of battery power and network capacity wasted by
+generating packets that will not make it to the receiver.<a href="#section-7.2-3.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-7.2-3.3">
+            <p id="section-7.2-3.3.1">When packet pacing is being used, the sending network
+implementation may choose voluntarily to moderate the rate at
+which it emits packets, so as to smooth the flow of packets into
+the network, even though the device’s outgoing first-hop interface
+might be easily capable of sending at a much higher rate.
+When packet pacing is being used, a temporary backlog
+can build up at this layer if the source is generating
+data faster than the pacing rate.<a href="#section-7.2-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-7.2-4">Whether the source application is constrained
+by a physical bottleneck on the sending device, or
+by an algorithmic bottleneck on the sending device,
+the benefits of not overcommitting data to the outgoing buffer are similar.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-5">As described in the introduction,
+the goal is for the application software to be able to
+write chunks of data large enough to be efficient,
+without writing too many of them too quickly,
+and causing unwanted self-inflicted delay.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="superiority-of-direct-backpressure">
+<section id="section-7.3">
+        <h3 id="name-superiority-of-direct-backp">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-superiority-of-direct-backp" class="section-name selfRef">Superiority of Direct Backpressure</a>
+        </h3>
+<p id="section-7.3-1">Since multi-hop network protocols already implement
 indirect backpressure in the form of discarding or marking packets,
-it can be tempting to use this mechanism
-for the first hop of the path too.
+it can be tempting to use the same mechanism
+to generate backpressure for first-hop physical bottlenecks.
+Superficially there might seem to be some attractive
+elegance in having the first hop use the same drop/mark
+mechanism as the remaining hops on the path.
 However, this is not an ideal solution because indirect
 backpressure from the network is very crude compared to
 the much richer direct backpressure
@@ -1783,22 +1886,22 @@ is a crude rate-control signal, because it takes a full network
 round-trip time before the effect of that drop or mark is
 observed at the receiver and echoed back to the sender, and
 it may take multiple such round trips before it finally
-results in an appropriate reduction in sending rate.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2">In contrast to queue buildup in the network,
+results in an appropriate reduction in sending rate.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-2">In contrast to queue buildup in the network,
 queue buildup at the sending device has different properties
 regarding (i) security, (ii) packet size constraints, and (iii) immediacy.
 This means that when it is the source device itself
 that is building up a backlog of unsent data,
-designers of networking software have more freedom about how to manage this.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3">(i) When the source of the data and the location of the backlog are
-the same physical device, network security and trust concerns do not apply.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.1-4">(ii) When the mechanism we use to communicate about queue state
+designers of networking software have more freedom about how to manage this.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<p id="section-7.3-3">(i) When the source of the data and the location of the backlog are
+the same physical device, network security and trust concerns do not apply.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
+<p id="section-7.3-4">(ii) When the mechanism we use to communicate about queue state
 is a software API instead of packets sent though a network,
 we do not have the constraint of having to work within
-limited IP packet header space.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
-<p id="section-7.1-5">(iii) When flow control is implemented via a local software API,
-the delivery of STOP/GO information to the source is immediate.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
-<p id="section-7.1-6">Direct backpressure can be achieved
+limited IP packet header space.<a href="#section-7.3-4" class="pilcrow">¶</a></p>
+<p id="section-7.3-5">(iii) When flow control is implemented via a local software API,
+the delivery of STOP/GO information to the source is immediate.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-6">Direct backpressure can be achieved
 simply making an API call block,
 or by returning a Unix EWOULDBLOCK error,
 or using equivalent mechanisms in other APIs,
@@ -1807,88 +1910,38 @@ Similarly, when the system becomes able to accept more data,
 unblocking an API call, indicating that a socket
 has become writable using select() or kevent(),
 or equivalent mechanisms in other APIs,
-has the effect of immediately allowing the production of more data.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
-<p id="section-7.1-7">Where direct backpressure mechanisms are possible they
-should be preferred over indirect backpressure mechanisms.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
-<p id="section-7.1-8">If the outgoing network interface on the source device
-is the slowest hop of a multi-hop network path, then this
-is where the backlog of unsent data will accumulate.
-This is often the case when a user has symmetric
-1Gb/s Internet service to the house, and they
-are accessing the Internet service using a device
-connected via Wi-Fi at a rate less than 1Gb/s.
-This can produce the ironic outcome that upgrading
-Internet service from 100Mb/s to 1Gb/s can sometimes result
-in a customer getting a worse user experience, because
-the upgrade causes the bottleneck hop to change location,
-from the Internet gateway
-(which may have good queue mangement using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>)
-to the Wi-Fi-connected device,
-which may have very poor source buffer management.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="algorithmic-bottlenecks">
-<section id="section-7.2">
-        <h3 id="name-algorithmic-bottlenecks">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-algorithmic-bottlenecks" class="section-name selfRef">Algorithmic Bottlenecks</a>
-        </h3>
-<p id="section-7.2-1">In addition to physical bottlenecks,
-devices also have intentional algorithmic bottlenecks:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.2-2.1">
-            <p id="section-7.2-2.1.1">If the TCP receive window is full, then the sending TCP
-implementation will voluntarily refrain from sending new data,
-even though the device’s outgoing first-hop interface is easily
-capable of sending those packets.
-This is vital to avoid overrunning the receiver with data
-faster than it can process it.<a href="#section-7.2-2.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-2.2">
-            <p id="section-7.2-2.2.1">The transport protocol’s rate management (congestion control) algorithm
-may determine that it should delay before sending more data, so as
-not to overflow a queue at some other bottleneck within the network.
-This is vital to avoid overrunning the capacity of the bottleneck
-network hop with data faster than it can forward it,
-resulting in massive packet loss,
-which would equate to a large wastage of resources at the sender,
-in the form of battery power and network capacity wasted by
-generating packets that will not make it to the receiver.<a href="#section-7.2-2.2.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.2-2.3">
-            <p id="section-7.2-2.3.1">When packet pacing is being used, the sending network
-implementation may choose voluntarily to moderate the rate at
-which it emits packets, so as to smooth the flow of packets into
-the network, even though the device’s outgoing first-hop interface
-might be easily capable of sending at a much higher rate.
-When packet pacing is being used, a temporary backlog
-can build up at this layer if the source is generating
-data faster than the pacing rate.<a href="#section-7.2-2.3.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-7.2-3">Whether the source application is constrained
-by a physical bottleneck on the sending device, or
-by an algorithmic bottleneck on the sending device,
-the benefits of not overcommitting data to the outgoing buffer are similar.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">As described in the introduction,
-the goal is for the application software to be able to
-write chunks of data large enough to be efficient,
-without writing too many of them too quickly,
-and causing unwanted self-inflicted delay.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+has the effect of immediately allowing the production of more data.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
+<p id="section-7.3-7">Indirect backpressure is vastly inferior to direct backpressure.
+For rate adjustment signals generated within the network,
+indirect backpressure has to be used because
+in that situation better alternatives are not available.
+Direct backpressure is vastly superior,
+and where direct backpressure mechanisms are possible they
+should be preferred over indirect backpressure mechanisms.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
+<p id="section-7.3-8">While there might seem to be some attractive elegance
+to using indirect backpressure for all hops in the network,
+having the first hop be the bottleneck is a common case,
+and that is the case where indirect backpressure is at
+its worst (it takes an entire network round trip to
+learn what is already known on the sending device),
+so the benefits mean that it is worth
+optimizing for this common case and making use
+of direct backpressure for first hop bottlenecks.<a href="#section-7.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="application-programming-interface">
-<section id="section-7.3">
+<section id="section-7.4">
         <h3 id="name-application-programming-int">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-application-programming-int" class="section-name selfRef">Application Programming Interface</a>
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-application-programming-int" class="section-name selfRef">Application Programming Interface</a>
         </h3>
-<p id="section-7.3-1">It is important to understand that these
+<p id="section-7.4-1">It is important to understand that these
 backpressure mechanisms at the API layer are not new.
 They have existed by necessity for as long as we have had
 networking APIs (or serial port APIs or file system APIs).
 The only difference here is that historically
 these backpressure mechanisms were exercised too late,
-after an excessive backlog had already built up.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">The proposal in this Source Buffer Management
+after an excessive backlog had already built up.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">The proposal in this Source Buffer Management
 document is not to define entirely new API mechanisms
 that did not previously exist, or to fundamentally
 change how networking applications are written;
@@ -1901,22 +1954,22 @@ it may be that the only change the application
 needs is to use TCP_REPLENISH_TIME to indicate
 its expected time budget to generate a new block
 of data, and everything else in the application
-remains completely unchanged.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+remains completely unchanged.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="bulk-transfer-protocols">
-<section id="section-7.4">
+<section id="section-7.5">
         <h3 id="name-bulk-transfer-protocols">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
         </h3>
-<p id="section-7.4-1">It is frequently asserted that latency matters primarily for
+<p id="section-7.5-1">It is frequently asserted that latency matters primarily for
 interactive applications like video conferencing and on-line games,
-and latency is relatively unimportant for most other applications.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<p id="section-7.4-2">We do not agree with this characterization.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
-<p id="section-7.4-3">Even for large bulk data transfers
+and latency is relatively unimportant for most other applications.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<p id="section-7.5-2">We do not agree with this characterization.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
+<p id="section-7.5-3">Even for large bulk data transfers
 -- e.g., downloading a software update or uploading a video --
-we believe latency affects performance.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
-<p id="section-7.4-4">For example, TCP fast retransmit can immediately
+we believe latency affects performance.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<p id="section-7.5-4">For example, TCP fast retransmit can immediately
 recover a single lost packet in a single round-trip time.
 TCP generally performs at its absolute best when the
 loss rate is no more than one loss per round-trip time.
@@ -1937,12 +1990,12 @@ A transport protocol cannot make rate adaptation changes
 to adjust to varying network conditions in less than one
 network round-trip time, so the higher the total network
 round-trip time is, the less agile the transport protocol
-is at adjusting to varying network conditions.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
-<p id="section-7.4-5">In short, a client running over a transport protocol like TCP
+is at adjusting to varying network conditions.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
+<p id="section-7.5-5">In short, a client running over a transport protocol like TCP
 may itself not be a real-time delay-sensitive application,
 but a transport protocol itself is most definitely a
 delay-sensitive application, responding in real time
-to changing network conditions.<a href="#section-7.4-5" class="pilcrow">¶</a></p>
+to changing network conditions.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

@@ -81,8 +81,9 @@ Table of Contents
    7.  Applicability
      7.1.  Physical Bottlenecks
      7.2.  Algorithmic Bottlenecks
-     7.3.  Application Programming Interface
-     7.4.  Bulk Transfer Protocols
+     7.3.  Superiority of Direct Backpressure
+     7.4.  Application Programming Interface
+     7.5.  Bulk Transfer Protocols
    8.  Alternative Proposals
      8.1.  Just use UDP
      8.2.  Packet Expiration
@@ -507,67 +508,45 @@ Table of Contents
 
 7.1.  Physical Bottlenecks
 
-   Since multi-hop network protocols already implement indirect
-   backpressure in the form of discarding or marking packets, it can be
-   tempting to use this mechanism for the first hop of the path too.
-   However, this is not an ideal solution because indirect backpressure
-   from the network is very crude compared to the much richer direct
-   backpressure that is available within the sending device itself.
-   Relying on indirect backpressure by discarding or marking a packet in
-   the sending device itself is a crude rate-control signal, because it
-   takes a full network round-trip time before the effect of that drop
-   or mark is observed at the receiver and echoed back to the sender,
-   and it may take multiple such round trips before it finally results
-   in an appropriate reduction in sending rate.
+   A backlog may build up on the sending device if the source of the
+   packets is simply generating them faster than the outgoing first-hop
+   interface is able to send them.  This will cause a queue to build up
+   in the network hardware or its associated driver.  In this case, to
+   avoid packets suffering excessive queueing delay, the hardware or its
+   driver needs to communicate backpressure to IP, which needs to
+   communicate backpressure to the transport protocol (TCP or QUIC),
+   which needs to communicate backpressure to the application that is
+   the source of the data.  We refer to this case as a physical
+   bottleneck.
 
-   In contrast to queue buildup in the network, queue buildup at the
-   sending device has different properties regarding (i) security, (ii)
-   packet size constraints, and (iii) immediacy.  This means that when
-   it is the source device itself that is building up a backlog of
-   unsent data, designers of networking software have more freedom about
-   how to manage this.
+   For an example of a physical bottleneck, consider the case when a
+   user has symmetric 1Gb/s Internet service, and they are sending data
+   from a device communicating via Wi-Fi at a lower rate, say 300 Mb/s.
+   In this case (assuming it is communicating with a well-connected
+   server on the Internet) the sending device’s Wi-Fi interface is the
+   limiting factor.  If the Wi-Fi hardware, driver, and networking
+   software does not produce appropriate backpressure, then outgoing
+   network traffic will experience increasing delays.
 
-   (i) When the source of the data and the location of the backlog are
-   the same physical device, network security and trust concerns do not
-   apply.
-
-   (ii) When the mechanism we use to communicate about queue state is a
-   software API instead of packets sent though a network, we do not have
-   the constraint of having to work within limited IP packet header
-   space.
-
-   (iii) When flow control is implemented via a local software API, the
-   delivery of STOP/GO information to the source is immediate.
-
-   Direct backpressure can be achieved simply making an API call block,
-   or by returning a Unix EWOULDBLOCK error, or using equivalent
-   mechanisms in other APIs, and has the effect of immediately halting
-   the flow of new data.  Similarly, when the system becomes able to
-   accept more data, unblocking an API call, indicating that a socket
-   has become writable using select() or kevent(), or equivalent
-   mechanisms in other APIs, has the effect of immediately allowing the
-   production of more data.
-
-   Where direct backpressure mechanisms are possible they should be
-   preferred over indirect backpressure mechanisms.
-
-   If the outgoing network interface on the source device is the slowest
-   hop of a multi-hop network path, then this is where the backlog of
-   unsent data will accumulate.  This is often the case when a user has
-   symmetric 1Gb/s Internet service to the house, and they are accessing
-   the Internet service using a device connected via Wi-Fi at a rate
-   less than 1Gb/s.  This can produce the ironic outcome that upgrading
-   Internet service from 100Mb/s to 1Gb/s can sometimes result in a
-   customer getting a worse user experience, because the upgrade causes
-   the bottleneck hop to change location, from the Internet gateway
-   (which may have good queue mangement using L4S [RFC9330]) to the Wi-
-   Fi-connected device, which may have very poor source buffer
-   management.
+   Poor backpressure from first-hop physical bottlenecks can produce the
+   ironic outcome that upgrading home Internet service from 100Mb/s to
+   1Gb/s can sometimes result in a customer getting a worse user
+   experience, because the upgrade causes the bottleneck hop to change
+   location, from the Internet gateway (which may have good queue
+   mangement using L4S [RFC9330]) to the source device’s Wi-Fi
+   interface, which may have very poor source buffer management.
 
 7.2.  Algorithmic Bottlenecks
 
-   In addition to physical bottlenecks, devices also have intentional
-   algorithmic bottlenecks:
+   In addition to physical bottlenecks, there are other reasons why
+   software on the sending device may choose to refrain from sending
+   data as fast as the outgoing first-hop interface can carry it.  We
+   refer to these as algorithmic bottlenecks.
+
+   In the case study in Section 4, the bottleneck was the transport
+   protocol’s rate management (congestion control) algorithm, not a
+   physical constraint of the outgoing first-hop interface (which was
+   gigabit Ethernet).
 
    *  If the TCP receive window is full, then the sending TCP
       implementation will voluntarily refrain from sending new data,
@@ -604,7 +583,68 @@ Table of Contents
    efficient, without writing too many of them too quickly, and causing
    unwanted self-inflicted delay.
 
-7.3.  Application Programming Interface
+7.3.  Superiority of Direct Backpressure
+
+   Since multi-hop network protocols already implement indirect
+   backpressure in the form of discarding or marking packets, it can be
+   tempting to use the same mechanism to generate backpressure for
+   first-hop physical bottlenecks.  Superficially there might seem to be
+   some attractive elegance in having the first hop use the same drop/
+   mark mechanism as the remaining hops on the path.  However, this is
+   not an ideal solution because indirect backpressure from the network
+   is very crude compared to the much richer direct backpressure that is
+   available within the sending device itself.  Relying on indirect
+   backpressure by discarding or marking a packet in the sending device
+   itself is a crude rate-control signal, because it takes a full
+   network round-trip time before the effect of that drop or mark is
+   observed at the receiver and echoed back to the sender, and it may
+   take multiple such round trips before it finally results in an
+   appropriate reduction in sending rate.
+
+   In contrast to queue buildup in the network, queue buildup at the
+   sending device has different properties regarding (i) security, (ii)
+   packet size constraints, and (iii) immediacy.  This means that when
+   it is the source device itself that is building up a backlog of
+   unsent data, designers of networking software have more freedom about
+   how to manage this.
+
+   (i) When the source of the data and the location of the backlog are
+   the same physical device, network security and trust concerns do not
+   apply.
+
+   (ii) When the mechanism we use to communicate about queue state is a
+   software API instead of packets sent though a network, we do not have
+   the constraint of having to work within limited IP packet header
+   space.
+
+   (iii) When flow control is implemented via a local software API, the
+   delivery of STOP/GO information to the source is immediate.
+
+   Direct backpressure can be achieved simply making an API call block,
+   or by returning a Unix EWOULDBLOCK error, or using equivalent
+   mechanisms in other APIs, and has the effect of immediately halting
+   the flow of new data.  Similarly, when the system becomes able to
+   accept more data, unblocking an API call, indicating that a socket
+   has become writable using select() or kevent(), or equivalent
+   mechanisms in other APIs, has the effect of immediately allowing the
+   production of more data.
+
+   Indirect backpressure is vastly inferior to direct backpressure.  For
+   rate adjustment signals generated within the network, indirect
+   backpressure has to be used because in that situation better
+   alternatives are not available.  Direct backpressure is vastly
+   superior, and where direct backpressure mechanisms are possible they
+   should be preferred over indirect backpressure mechanisms.
+
+   While there might seem to be some attractive elegance to using
+   indirect backpressure for all hops in the network, having the first
+   hop be the bottleneck is a common case, and that is the case where
+   indirect backpressure is at its worst (it takes an entire network
+   round trip to learn what is already known on the sending device), so
+   the benefits mean that it is worth optimizing for this common case
+   and making use of direct backpressure for first hop bottlenecks.
+
+7.4.  Application Programming Interface
 
    It is important to understand that these backpressure mechanisms at
    the API layer are not new.  They have existed by necessity for as
@@ -624,7 +664,7 @@ Table of Contents
    generate a new block of data, and everything else in the application
    remains completely unchanged.
 
-7.4.  Bulk Transfer Protocols
+7.5.  Bulk Transfer Protocols
 
    It is frequently asserted that latency matters primarily for
    interactive applications like video conferencing and on-line games,
