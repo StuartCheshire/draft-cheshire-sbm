@@ -1215,7 +1215,10 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
                 <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-application-programming-int" class="internal xref">Application Programming Interface</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-relationship-between-throug" class="internal xref">Relationship Between Throughput and Delay</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-bulk-transfer-protocols" class="internal xref">Bulk Transfer Protocols</a></p>
 </li>
             </ul>
 </li>
@@ -1973,19 +1976,42 @@ of data, and everything else in the application
 remains completely unchanged.<a href="#section-7.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="bulk-transfer-protocols">
+<div id="relationship-between-throughput-and-delay">
 <section id="section-7.5">
-        <h3 id="name-bulk-transfer-protocols">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
+        <h3 id="name-relationship-between-throug">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-relationship-between-throug" class="section-name selfRef">Relationship Between Throughput and Delay</a>
         </h3>
-<p id="section-7.5-1">It is frequently asserted that latency matters primarily for
+<p id="section-7.5-1">Is is important to understand that Source Buffer Management
+using TCP_REPLENISH_TIME does not alter the overall
+long-term average throughput of a data transfer.
+Calculating the optimum rate to send data
+(so as not to exceed receiver’s capacity,
+or the available network capacity)
+remains the responsibility of the transport protocol.
+Using TCP_REPLENISH_TIME does not alter the data rate;
+it alters the time delay between when data generated
+and when that data departs the sending device.
+Using the example from <a href="#casestudy" class="auto internal xref">Section 4</a>, in both cases
+the long-term average throughput was 500 kb/s.
+What changed was that originally the application was
+generating 500 kb/s with two seconds of outgoing delay;
+after using TCP_REPLENISH_TIME the application was
+generating 500 kb/s with 250 milliseconds of outgoing delay;<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="bulk-transfer-protocols">
+<section id="section-7.6">
+        <h3 id="name-bulk-transfer-protocols">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-bulk-transfer-protocols" class="section-name selfRef">Bulk Transfer Protocols</a>
+        </h3>
+<p id="section-7.6-1">It is frequently asserted that latency matters primarily for
 interactive applications like video conferencing and on-line games,
-and latency is relatively unimportant for most other applications.<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<p id="section-7.5-2">We do not agree with this characterization.<a href="#section-7.5-2" class="pilcrow">¶</a></p>
-<p id="section-7.5-3">Even for large bulk data transfers
+and latency is relatively unimportant for most other applications.<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<p id="section-7.6-2">We do not agree with this characterization.<a href="#section-7.6-2" class="pilcrow">¶</a></p>
+<p id="section-7.6-3">Even for large bulk data transfers
 -- e.g., downloading a software update or uploading a video --
-we believe latency affects performance.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
-<p id="section-7.5-4">For example, TCP fast retransmit can immediately
+we believe latency affects performance.<a href="#section-7.6-3" class="pilcrow">¶</a></p>
+<p id="section-7.6-4">For example, TCP fast retransmit can immediately
 recover a single lost packet in a single round-trip time.
 TCP generally performs at its absolute best when the
 loss rate is no more than one loss per round-trip time.
@@ -2006,12 +2032,12 @@ A transport protocol cannot make rate adaptation changes
 to adjust to varying network conditions in less than one
 network round-trip time, so the higher the total network
 round-trip time is, the less agile the transport protocol
-is at adjusting to varying network conditions.<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<p id="section-7.5-5">In short, a client running over a transport protocol like TCP
+is at adjusting to varying network conditions.<a href="#section-7.6-4" class="pilcrow">¶</a></p>
+<p id="section-7.6-5">In short, a client running over a transport protocol like TCP
 may itself not be a real-time delay-sensitive application,
 but a transport protocol itself is most definitely a
 delay-sensitive application, responding in real time
-to changing network conditions.<a href="#section-7.5-5" class="pilcrow">¶</a></p>
+to changing network conditions.<a href="#section-7.6-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
