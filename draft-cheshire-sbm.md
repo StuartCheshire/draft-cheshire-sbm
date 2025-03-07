@@ -266,17 +266,33 @@ When a flow of packets travels 30 hops though
 a network, the bottleneck hop may be quite distant
 from the original source of the data stream.
 
-For example, when a cable modem
-with a 35Mb/s output rate receives
-an excessive flow of packets coming in
-on its Gb/s Ethernet interface,
-the cable modem cannot directly cause
-the sending application to block or receive an EWOULDBLOCK error.
-The cable modem’s choices are limited to
-enqueueing an incoming packet,
-discarding an incoming packet,
-or enqueueing an incoming packet and
+For example, consider the case of
+a smartphone communicating via a Wi-Fi Access Point at 600 Mb/s,
+which is connected to a home NAT gateway via gigabit Ethernet,
+which is connected to a cable modem via gigabit Ethernet,
+which has an upstream output rate of 35Mb/s over the coaxial cable.
+When the cable modem experiences
+an excessive flow of incoming packets arriving
+on its gigabit Ethernet interface,
+the cable modem has no direct way to cause
+the networking code on the smartphone to curtail
+the influx of data by pausing the sending application
+via blocking its write calls or delivering EWOULDBLOCK errors.
+The source of the excessive flood of data
+causing the problem (the smartphone)
+is three network hops away from the device
+experiencing the problem (the cable modem).
+When an incoming packet arrives,
+the cable modem’s choices are limited to
+enqueueing the packet,
+discarding the packet,
+or enqueueing the packet and
 marking it with an ECN CE mark {{RFC3168}} {{RFC9330}}.
+The cable modem drops or marks an incoming packet
+in the expectation that this will, eventually,
+indirectly, cause the networking code and operating system
+on the sending device to take the necessary steps
+to curtail the sending application.
 
 The reasons the cable modem’s choices are so limited
 are because of security and packet size constraints.
