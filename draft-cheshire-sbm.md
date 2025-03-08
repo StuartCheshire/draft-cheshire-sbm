@@ -256,9 +256,10 @@ network capacity and other resources like CPU time.
 
 All of the situations described above using “direct backpressure”
 are one-hop communication where the CPU generating the data
-is connected more-or-less directly to the device receiving the data.
+is connected more-or-less directly to the device consuming the data.
 In these cases it is relatively simple for the receiving device
-to exert backpressure to influence the rate at which the CPU sends data.
+to exert direct backpressure to influence
+the rate at which the CPU sends data.
 
 When we introduce multi-hop networking,
 the situation becomes more complicated.
@@ -763,8 +764,8 @@ of direct backpressure for first hop bottlenecks.
 It is important to understand that these
 backpressure mechanisms at the API layer are not new.
 They have existed by necessity for as long as we have had
-networking APIs (or serial port APIs or file system APIs).
-The only difference here is that historically
+networking APIs (or serial port APIs, or file system APIs, etc.).
+The problem with these APIs has been that historically
 these backpressure mechanisms were exercised too late,
 after an excessive backlog had already built up.
 
@@ -772,13 +773,13 @@ The proposal in this Source Buffer Management
 document is not to define entirely new API mechanisms
 that did not previously exist, or to fundamentally
 change how networking applications are written;
-it is primarily to use existing networking APIs
-more effectively.
+the proposal is to use existing
+networking API mechanisms more effectively.
 Depending on how a networking application is written,
 using kevent() or similar mechanisms
 to tell it when it is time to write to a socket,
 it may be that the only change the application
-needs is to use TCP\_REPLENISH\_TIME to indicate
+needs is a single call using TCP\_REPLENISH\_TIME to indicate
 its expected time budget to generate a new block
 of data, and everything else in the application
 remains completely unchanged.
