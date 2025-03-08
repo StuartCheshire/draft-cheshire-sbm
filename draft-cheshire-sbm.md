@@ -449,8 +449,8 @@ that it is time to begin working on generating fresh data.
 The Linux version determines a high-water mark for unsent data,
 above which the application is **prevented** from writing any more,
 even if it has data prepared and ready to enqueue.
-Setting TCP\_NOTSENT\_LOWAT to 16 kilobytes works well on Apple
-systems, but can severely limit throughput on Linux systems.
+Setting TCP\_NOTSENT\_LOWAT to 16 kilobytes works well on Apple systems,
+but can increase CPU load and severely limit throughput on Linux systems.
 This has led to confusion among developers and makes it difficult
 to write portable code that works on both platforms.
 
