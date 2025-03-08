@@ -1703,7 +1703,8 @@ is notified to begin working on generating more data.<a href="#section-5.2-6" cl
 <p id="section-5.3-1">TCP_NOTSENT_LOWAT was initially defined only for TCP,
 and only for the BSD Sockets programming interface.
 It would be useful to define equivalent delay management
-capabilities for other transport protocols, like QUIC,
+capabilities for other transport protocols,
+like QUIC <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span><span>[<a href="#RFC9369" class="cite xref">RFC9369</a>]</span>,
 and for other network programming APIs.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2062,9 +2063,10 @@ If an application sends UDP packets faster than the outgoing
 network interface can carry them, then a queue of packets
 will still build up, causing increasing delay for those packets,
 and eventual packet loss when the queue reaches its capacity.<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<p id="section-8.1-2">Any protocol that runs over UDP (like QUIC) must end up
-re-creating the same rate adaptation behaviors that are
-already built into TCP, or it will fail to operate
+<p id="section-8.1-2">Any protocol that runs over UDP
+(like QUIC <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span><span>[<a href="#RFC9369" class="cite xref">RFC9369</a>]</span>) must end up
+re-creating the same rate optimization behaviors that
+are already built into TCP, or it will fail to operate
 gracefully over a range of different network conditions.<a href="#section-8.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2220,9 +2222,17 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-9-1"
         <dd>
 <span class="refAuthor">Hoeiland-Joergensen, T.</span>, <span class="refAuthor">McKenney, P.</span>, <span class="refAuthor">Taht, D.</span>, <span class="refAuthor">Gettys, J.</span>, and <span class="refAuthor">E. Dumazet</span>, <span class="refTitle">"The Flow Queue CoDel Packet Scheduler and Active Queue Management Algorithm"</span>, <span class="seriesInfo">RFC 8290</span>, <span class="seriesInfo">DOI 10.17487/RFC8290</span>, <time datetime="2018-01" class="refDate">January 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8290">https://www.rfc-editor.org/rfc/rfc8290</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9000">[RFC9000]</dt>
+        <dd>
+<span class="refAuthor">Iyengar, J., Ed.</span> and <span class="refAuthor">M. Thomson, Ed.</span>, <span class="refTitle">"QUIC: A UDP-Based Multiplexed and Secure Transport"</span>, <span class="seriesInfo">RFC 9000</span>, <span class="seriesInfo">DOI 10.17487/RFC9000</span>, <time datetime="2021-05" class="refDate">May 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9000">https://www.rfc-editor.org/rfc/rfc9000</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC9330">[RFC9330]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Briscoe, B., Ed.</span>, <span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Bagnulo, M.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service: Architecture"</span>, <span class="seriesInfo">RFC 9330</span>, <span class="seriesInfo">DOI 10.17487/RFC9330</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9330">https://www.rfc-editor.org/rfc/rfc9330</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9369">[RFC9369]</dt>
+      <dd>
+<span class="refAuthor">Duke, M.</span>, <span class="refTitle">"QUIC Version 2"</span>, <span class="seriesInfo">RFC 9369</span>, <span class="seriesInfo">DOI 10.17487/RFC9369</span>, <time datetime="2023-05" class="refDate">May 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9369">https://www.rfc-editor.org/rfc/rfc9369</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>

@@ -453,7 +453,8 @@ Table of Contents
    TCP_NOTSENT_LOWAT was initially defined only for TCP, and only for
    the BSD Sockets programming interface.  It would be useful to define
    equivalent delay management capabilities for other transport
-   protocols, like QUIC, and for other network programming APIs.
+   protocols, like QUIC [RFC9000][RFC9369], and for other network
+   programming APIs.
 
 6.  TCP_REPLENISH_TIME
 
@@ -743,10 +744,10 @@ Table of Contents
    up, causing increasing delay for those packets, and eventual packet
    loss when the queue reaches its capacity.
 
-   Any protocol that runs over UDP (like QUIC) must end up re-creating
-   the same rate adaptation behaviors that are already built into TCP,
-   or it will fail to operate gracefully over a range of different
-   network conditions.
+   Any protocol that runs over UDP (like QUIC [RFC9000][RFC9369]) must
+   end up re-creating the same rate optimization behaviors that are
+   already built into TCP, or it will fail to operate gracefully over a
+   range of different network conditions.
 
 8.2.  Packet Expiration
 
@@ -874,11 +875,20 @@ Table of Contents
               DOI 10.17487/RFC8290, January 2018,
               <https://www.rfc-editor.org/rfc/rfc8290>.
 
+   [RFC9000]  Iyengar, J., Ed. and M. Thomson, Ed., "QUIC: A UDP-Based
+              Multiplexed and Secure Transport", RFC 9000,
+              DOI 10.17487/RFC9000, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9000>.
+
    [RFC9330]  Briscoe, B., Ed., De Schepper, K., Bagnulo, M., and G.
               White, "Low Latency, Low Loss, and Scalable Throughput
               (L4S) Internet Service: Architecture", RFC 9330,
               DOI 10.17487/RFC9330, January 2023,
               <https://www.rfc-editor.org/rfc/rfc9330>.
+
+   [RFC9369]  Duke, M., "QUIC Version 2", RFC 9369,
+              DOI 10.17487/RFC9369, May 2023,
+              <https://www.rfc-editor.org/rfc/rfc9369>.
 
 Acknowledgments
 
