@@ -386,9 +386,9 @@ Table of Contents
    mark for unsent data, above which the application is *prevented* from
    writing any more, even if it has data prepared and ready to enqueue.
    Setting TCP_NOTSENT_LOWAT to 16 kilobytes works well on Apple
-   systems, but can severely limit throughput on Linux systems.  This
-   has led to confusion among developers and makes it difficult to write
-   portable code that works on both platforms.
+   systems, but can increase CPU load and severely limit throughput on
+   Linux systems.  This has led to confusion among developers and makes
+   it difficult to write portable code that works on both platforms.
 
 5.2.  Time versus Bytes
 
