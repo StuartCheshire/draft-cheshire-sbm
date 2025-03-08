@@ -794,14 +794,14 @@ Calculating the optimum rate to send data
 or the available network capacity)
 remains the responsibility of the transport protocol.
 Using TCP\_REPLENISH\_TIME does not alter the data rate;
-it alters the time delay between when data generated
-and when that data departs the sending device.
+it controls the delay between the time when data is generated
+and the time when that data departs the sending device.
 Using the example from {{casestudy}}, in both cases
 the long-term average throughput was 500 kb/s.
 What changed was that originally the application was
 generating 500 kb/s with two seconds of outgoing delay;
 after using TCP\_REPLENISH\_TIME the application was
-generating 500 kb/s with 250 milliseconds of outgoing delay;
+generating 500 kb/s with 250 milliseconds of outgoing delay.
 
 ## Bulk Transfer Protocols
 
