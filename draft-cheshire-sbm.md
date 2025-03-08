@@ -74,7 +74,9 @@ informative:
   RFC6143:
   RFC8033:
   RFC8290:
+  RFC9000:
   RFC9330:
+  RFC9369:
   MMADAPT:
     author:
      - ins: Aiman Erbad
@@ -526,7 +528,8 @@ is notified to begin working on generating more data.
 TCP\_NOTSENT\_LOWAT was initially defined only for TCP,
 and only for the BSD Sockets programming interface.
 It would be useful to define equivalent delay management
-capabilities for other transport protocols, like QUIC,
+capabilities for other transport protocols,
+like QUIC {{RFC9000}}{{RFC9369}},
 and for other network programming APIs.
 
 # TCP\_REPLENISH\_TIME
@@ -858,9 +861,10 @@ network interface can carry them, then a queue of packets
 will still build up, causing increasing delay for those packets,
 and eventual packet loss when the queue reaches its capacity.
 
-Any protocol that runs over UDP (like QUIC) must end up
-re-creating the same rate adaptation behaviors that are
-already built into TCP, or it will fail to operate
+Any protocol that runs over UDP
+(like QUIC {{RFC9000}}{{RFC9369}}) must end up
+re-creating the same rate optimization behaviors that
+are already built into TCP, or it will fail to operate
 gracefully over a range of different network conditions.
 
 ## Packet Expiration
