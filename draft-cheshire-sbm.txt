@@ -707,12 +707,12 @@ Table of Contents
    update or uploading a video -- we believe latency affects
    performance.
 
-   For example, TCP fast retransmit can immediately recover a single
-   lost packet in a single round-trip time.  TCP generally performs at
-   its absolute best when the loss rate is no more than one loss per
-   round-trip time.  More than one loss per round-trip time requires
-   more extensive use of TCP SACK blocks, which consume extra space in
-   the packet header, and makes the work of the rate management
+   For example, TCP Fast Retransmit [RFC5681] can immediately recover a
+   single lost packet in a single round-trip time.  TCP generally
+   performs at its absolute best when the loss rate is no more than one
+   loss per round-trip time.  More than one loss per round-trip time
+   requires more extensive use of TCP SACK blocks, which consume extra
+   space in the packet header, and makes the work of the rate management
    (congestion control) algorithm harder.  This can result in the
    transport protocol temporarily sending too fast, resulting in
    additional packet loss, or too slowly, resulting in underutilized
@@ -858,6 +858,10 @@ Table of Contents
               of Explicit Congestion Notification (ECN) to IP",
               RFC 3168, DOI 10.17487/RFC3168, September 2001,
               <https://www.rfc-editor.org/rfc/rfc3168>.
+
+   [RFC5681]  Allman, M., Paxson, V., and E. Blanton, "TCP Congestion
+              Control", RFC 5681, DOI 10.17487/RFC5681, September 2009,
+              <https://www.rfc-editor.org/rfc/rfc5681>.
 
    [RFC6143]  Richardson, T. and J. Levine, "The Remote Framebuffer
               Protocol", RFC 6143, DOI 10.17487/RFC6143, March 2011,
