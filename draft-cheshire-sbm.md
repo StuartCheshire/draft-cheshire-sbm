@@ -868,6 +868,20 @@ re-creating the same rate optimization behaviors that
 are already built into TCP, or it will fail to operate
 gracefully over a range of different network conditions.
 
+Networking APIs for UDP cannot include capabilities like
+reliability, in-order delivery, and rate optimization,
+because the UDP header has no sequence number or similar
+fields that would make these capabilities possible.
+However, networking APIs for UDP SHOULD provide appropriate
+backpressure to the client software, so that software
+using UDP can avoid unnecessary self-inflicted
+delays when inadvertently attempting to send faster
+than the outgoing first-hop interface can carry it.
+This backpressure allows advanced protocols
+like QUIC to provide capabilities like reliability,
+in-order delivery, and rate optimization, while avoiding
+unwanted delay caused by on-device first-hop buffering.
+
 ## Packet Expiration
 
 One approach that is sometimes used, is to send packets
