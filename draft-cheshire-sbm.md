@@ -71,6 +71,7 @@ informative:
     seriesinfo: Apple Worldwide Developer Conference
     target: https://developer.apple.com/videos/play/wwdc2015/719/?time=2199
   RFC3168:
+  RFC5681:
   RFC6143:
   RFC8033:
   RFC8290:
@@ -818,7 +819,7 @@ Even for large bulk data transfers
 -- e.g., downloading a software update or uploading a video --
 we believe latency affects performance.
 
-For example, TCP fast retransmit can immediately
+For example, TCP Fast Retransmit {{RFC5681}} can immediately
 recover a single lost packet in a single round-trip time.
 TCP generally performs at its absolute best when the
 loss rate is no more than one loss per round-trip time.
