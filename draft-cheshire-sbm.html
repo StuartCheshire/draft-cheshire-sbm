@@ -2136,7 +2136,8 @@ that frame, but also in the construction of subsequent frames.<a href="#section-
 <p id="section-8.3-1">People are often very concerned about the problem of
 head-of-line-blocking, and propose to solve it using
 techniques such as packet priorities,
-and the ability cancel unsent pending messages <span>[<a href="#MMADAPT" class="cite xref">MMADAPT</a>]</span>.
+the ability cancel unsent pending messages <span>[<a href="#MMADAPT" class="cite xref">MMADAPT</a>]</span>,
+and out-of-order delivery on the receiving side.
 There is an unconscious unstated assumption baked into
 this line of reasoning, which is that having an excessively
 long queue is inevitable and unavoidable, and therefore
@@ -2146,6 +2147,65 @@ In contrast, if we take steps to keep queues short,
 the problems of head-of-line-blocking largely go away.
 When the line is consistently short, being at the back of
 the line is no longer the serious problem that it used to be.<a href="#section-8.3-1" class="pilcrow">¶</a></p>
+<p id="section-8.3-2">On the receiving device, if a single packet is lost,
+then subsequent data cannot be delivered
+to the receiving application in-order
+until the missing packet is retransmitted
+and arrives at the receiver to fill in the gap.
+Using techniques like TCP Fast Retransmit <span>[<a href="#RFC5681" class="cite xref">RFC5681</a>]</span>,
+this recovery can occur in a single network round-trip time,
+making the effective application-layer round-trip time
+for that data twice the underlying network round-trip time.
+When using techniques like L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>
+to minimize network losses and queueing delays,
+even twice the network round-trip time may be substantially
+better than today’s typical network round-trip times.
+For many applications the difference between
+one network round-trip time and
+two network round-trip times may have
+negligible effect on the user experience of that application,
+especially if such degradations are rare.<a href="#section-8.3-2" class="pilcrow">¶</a></p>
+<p id="section-8.3-3">There is a small class of applications,
+like audio and video conferencing over long distances,
+where people may feel that
+a single network round-trip time provides adequate user experience
+but two network round-trip times would be unacceptable.
+This is the scenario where out-of-order delivery
+on the receiving side appears attractive.
+However, writing application code to take advantage of
+out-of-order delivery has proven to be surprising difficult.
+Many modern data types are not amenable to easy interpretation
+when parts of the data are missing.
+In compressed data, such as ZIP files, JPEG images,
+and modern video formats,
+correct interpretation of data depends on having the
+data that preceded it, making it very difficult to write
+software that will correctly handle gaps in the data.
+For example, in a compressed video stream where a frame is encoded
+as differences relative to the previous frame, there is no easy
+way to decode the current frame when the previous frame is missing.<a href="#section-8.3-3" class="pilcrow">¶</a></p>
+<p id="section-8.3-4">In a network using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span> the motivation
+for writing extremely complicated software to handle
+out-of-order delivery (i.e., data with gaps) is weak,
+especially when L4S makes actual packet loss exceedingly rare,
+and Fast Retransmit recovers from these rare losses
+in a single extra round-trip time,
+which is low when L4S is being used.<a href="#section-8.3-4" class="pilcrow">¶</a></p>
+<p id="section-8.3-5">Note that the justification for scenarios
+where one network round-trip time is acceptable
+but two network round-trip times would be unacceptable
+only applies when the network round-trip time is large
+relative to the user-experience requirements of the application.
+For example, for distributing real-time audio within a home network,
+where round-trip delays over the local Ethernet or Wi-Fi network
+are just a few milliseconds, using Fast Retransmit to recover
+occasional lost packets within a few milliseconds <span>[<a href="#TCPFR" class="cite xref">TCPFR</a>]</span>
+makes the application programming easy and is preferable
+to playing degraded audio due to gaps in the data stream.
+To give some calibration, the speed of sound in air is
+roughly one foot per millisecond, so a 5 ms playback delay
+buffer to allow for loss recovery equates to the same delay
+as standing five feet further away from the speakers.<a href="#section-8.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2248,8 +2308,12 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-9-1"
 <span class="refAuthor">Briscoe, B., Ed.</span>, <span class="refAuthor">De Schepper, K.</span>, <span class="refAuthor">Bagnulo, M.</span>, and <span class="refAuthor">G. White</span>, <span class="refTitle">"Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service: Architecture"</span>, <span class="seriesInfo">RFC 9330</span>, <span class="seriesInfo">DOI 10.17487/RFC9330</span>, <time datetime="2023-01" class="refDate">January 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9330">https://www.rfc-editor.org/rfc/rfc9330</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9369">[RFC9369]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Duke, M.</span>, <span class="refTitle">"QUIC Version 2"</span>, <span class="seriesInfo">RFC 9369</span>, <span class="seriesInfo">DOI 10.17487/RFC9369</span>, <time datetime="2023-05" class="refDate">May 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9369">https://www.rfc-editor.org/rfc/rfc9369</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TCPFR">[TCPFR]</dt>
+      <dd>
+<span class="refAuthor">Cheshire, S.</span>, <span class="refTitle">"Ruckus WiFi Evaluation"</span>, <time datetime="2006-04" class="refDate">April 2006</time>, <span>&lt;<a href="http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf">http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
