@@ -85,15 +85,16 @@ Table of Contents
      7.4.  Application Programming Interface
      7.5.  Relationship Between Throughput and Delay
      7.6.  Bulk Transfer Protocols
-   8.  Alternative Proposals
-     8.1.  Just use UDP
-     8.2.  Packet Expiration
-     8.3.  Head of Line Blocking / Traffic Priorities
-   9.  Security Considerations
-   10. IANA Considerations
-   11. References
-     11.1.  Normative References
-     11.2.  Informative References
+   8.  Experimental Validation
+   9.  Alternative Proposals
+     9.1.  Just use UDP
+     9.2.  Packet Expiration
+     9.3.  Head of Line Blocking / Traffic Priorities
+   10. Security Considerations
+   11. IANA Considerations
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -731,9 +732,29 @@ Table of Contents
    transport protocol itself is most definitely a delay-sensitive
    application, responding in real time to changing network conditions.
 
-8.  Alternative Proposals
+8.  Experimental Validation
 
-8.1.  Just use UDP
+   The mechanisms described in this document do not exist for purely
+   ideological or philosophical reasons.  Any work to improve source
+   buffer management in end systems should be validated by confirming
+   that real-world applications exhibit verifiably improved
+   responsiveness, and by taking measurements using benchmark tools that
+   measure application-layer round-trip times under realistic working
+   conditions [RPM].  Using the ‘ping’ command to send one ICMP Echo
+   packet [RFC792] per second on an otherwise idle network is not a good
+   predictor of real-world application performance.  Testing the
+   scenario where the outgoing buffer is almost always completely empty
+   due to lack of traffic does not reveal anything about how it will
+   perform when a nontrivial amount of data is being sent and the buffer
+   is no longer empty.  The quality of the source buffer management
+   policy and the effectiveness of its backpressure mechanisms only
+   become apparent when a source of the data is willing and able to
+   exceed the available network capacity, and the backpressure
+   mechanisms are required to regulate the rate that data is being sent.
+
+9.  Alternative Proposals
+
+9.1.  Just use UDP
 
    Because much of the discussion about network latency involves talking
    about the behavior of transport protocols like TCP, sometimes people
@@ -761,7 +782,7 @@ Table of Contents
    delivery, and rate optimization, while avoiding unwanted delay caused
    by on-device first-hop buffering.
 
-8.2.  Packet Expiration
+9.2.  Packet Expiration
 
    One approach that is sometimes used, is to send packets tagged with
    an expiration time, and if they have spent too long waiting in the
@@ -798,7 +819,7 @@ Table of Contents
    display that frame, but also in the construction of subsequent
    frames.
 
-8.3.  Head of Line Blocking / Traffic Priorities
+9.3.  Head of Line Blocking / Traffic Priorities
 
    People are often very concerned about the problem of head-of-line-
    blocking, and propose to solve it using techniques such as packet
@@ -865,18 +886,18 @@ Table of Contents
    delay buffer to allow for loss recovery equates to the same delay as
    standing five feet further away from the speakers.
 
-9.  Security Considerations
+10.  Security Considerations
 
    No security concerns are anticipated resulting from reducing the
    amount of stale data sitting in buffers at the sender.
 
-10.  IANA Considerations
+11.  IANA Considerations
 
    This document has no IANA actions.
 
-11.  References
+12.  References
 
-11.1.  Normative References
+12.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -887,7 +908,7 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-11.2.  Informative References
+12.2.  Informative References
 
    [Bloat1]   Gettys, J., "Whose house is of glasse, must not throw
               stones at another", December 2010,
@@ -932,6 +953,10 @@ Table of Contents
               Protocol", RFC 6143, DOI 10.17487/RFC6143, March 2011,
               <https://www.rfc-editor.org/rfc/rfc6143>.
 
+   [RFC792]   Postel, J., "Internet Control Message Protocol", STD 5,
+              RFC 792, DOI 10.17487/RFC0792, September 1981,
+              <https://www.rfc-editor.org/rfc/rfc792>.
+
    [RFC8033]  Pan, R., Natarajan, P., Baker, F., and G. White,
               "Proportional Integral Controller Enhanced (PIE): A
               Lightweight Control Scheme to Address the Bufferbloat
@@ -958,6 +983,13 @@ Table of Contents
    [RFC9369]  Duke, M., "QUIC Version 2", RFC 9369,
               DOI 10.17487/RFC9369, May 2023,
               <https://www.rfc-editor.org/rfc/rfc9369>.
+
+   [RPM]      Paasch, C., Meyer, R., Cheshire, S., and W. Hawkins,
+              "Responsiveness under Working Conditions", Work in
+              Progress, Internet-Draft, draft-ietf-ippm-responsiveness-
+              05, 21 October 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-ippm-
+              responsiveness-05>.
 
    [TCPFR]    Cheshire, S., "Ruckus WiFi Evaluation", April 2006,
               <http://stuartcheshire.org/papers/Ruckus-WiFi-
