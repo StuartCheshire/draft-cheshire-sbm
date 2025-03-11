@@ -70,7 +70,18 @@ informative:
     date: June 2015
     seriesinfo: Apple Worldwide Developer Conference
     target: https://developer.apple.com/videos/play/wwdc2015/719/?time=2199
-  RPM: I-D.ietf-ippm-responsiveness
+  Herbert:
+    author:
+     - ins: Tom Herbert
+    title: "Byte Queue Limits: the unauthorized biography"
+    date: January 2025
+    target: https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83
+  Hruby:
+    author:
+     - ins: Tomáš Hrubý
+    title: "Byte Queue Limits"
+    date: August 2012
+    target: https://blog.linuxplumbersconf.org/2012/wp-content/uploads/2012/08/bql_slide.pdf
   MMADAPT:
     author:
      - ins: Aiman Erbad
@@ -88,12 +99,19 @@ informative:
   RFC9000:
   RFC9330:
   RFC9369:
+  RPM: I-D.ietf-ippm-responsiveness
   TCPFR:
     author:
      - ins: S. Cheshire
     title: "Ruckus WiFi Evaluation"
     date: April 2006
     target: http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf
+  THJ:
+    author:
+     - ins: Toke Høiland-Jørgensen
+    title: "The State of the Art in Bufferbloat Testing and Reduction on Linux"
+    date: March 2013
+    target: https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf
 
 --- abstract
 
@@ -632,22 +650,29 @@ the application that is the source of the data.
 We refer to this case as a physical bottleneck.
 
 For an example of a physical bottleneck,
-consider the case when a user has symmetric
+consider the case where a user has symmetric
 1Gb/s Internet service,
 and they are sending data from a device
 communicating via Wi-Fi at a lower rate, say 300 Mb/s.
-In this case (assuming it is communicating
+In this case (assuming the device is communicating
 with a well-connected server on the Internet)
-the limiting factor is the sending device’s Wi-Fi interface.
-If the Wi-Fi hardware, driver, and networking software
+the limiting factor of the entire path is
+the first hop -- the sending device’s Wi-Fi interface.
+If the device’s Wi-Fi hardware, driver, and networking software
 does not produce appropriate backpressure, then outgoing
 network traffic will experience increasing delays.
+The Linux Byte Queue Limits mechanism {{Hruby}}{{THJ}}{{Herbert}}
+is one example of a technique to tune hardware buffers
+to an appropriate size so that they are large enough
+to avoid transmitter starvation without being
+so large that they unnecessarily increase delay.
 
 Poor backpressure from first-hop physical bottlenecks
 can produce the ironic outcome that upgrading
 home Internet service from 100Mb/s to 1Gb/s can sometimes
 result in a customer getting a worse user experience,
-because the upgrade causes the bottleneck hop to change location,
+because the service upgrade
+causes the bottleneck hop to change location,
 from the Internet gateway
 (which may have good queue mangement using L4S {{RFC9330}})
 to the source device’s Wi-Fi interface,
