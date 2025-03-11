@@ -1811,21 +1811,28 @@ needs to communicate backpressure to
 the application that is the source of the data.
 We refer to this case as a physical bottleneck.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <p id="section-7.1-2">For an example of a physical bottleneck,
-consider the case when a user has symmetric
+consider the case where a user has symmetric
 1Gb/s Internet service,
 and they are sending data from a device
 communicating via Wi-Fi at a lower rate, say 300 Mb/s.
-In this case (assuming it is communicating
+In this case (assuming the device is communicating
 with a well-connected server on the Internet)
-the limiting factor is the sending device’s Wi-Fi interface.
-If the Wi-Fi hardware, driver, and networking software
+the limiting factor of the entire path is
+the first hop -- the sending device’s Wi-Fi interface.
+If the device’s Wi-Fi hardware, driver, and networking software
 does not produce appropriate backpressure, then outgoing
-network traffic will experience increasing delays.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+network traffic will experience increasing delays.
+The Linux Byte Queue Limits mechanism <span>[<a href="#Hruby" class="cite xref">Hruby</a>]</span><span>[<a href="#THJ" class="cite xref">THJ</a>]</span><span>[<a href="#Herbert" class="cite xref">Herbert</a>]</span>
+is one example of a technique to tune hardware buffers
+to an appropriate size so that they are large enough
+to avoid transmitter starvation without being
+so large that they unnecessarily increase delay.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
 <p id="section-7.1-3">Poor backpressure from first-hop physical bottlenecks
 can produce the ironic outcome that upgrading
 home Internet service from 100Mb/s to 1Gb/s can sometimes
 result in a customer getting a worse user experience,
-because the upgrade causes the bottleneck hop to change location,
+because the service upgrade
+causes the bottleneck hop to change location,
 from the Internet gateway
 (which may have good queue mangement using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>)
 to the source device’s Wi-Fi interface,
@@ -2306,6 +2313,14 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-10-1
         <dd>
 <span class="refAuthor">Cheshire, S.</span>, <span class="refTitle">"Your App and Next Generation Networks"</span>, <span class="seriesInfo">Apple Worldwide Developer Conference </span>, <time datetime="2015-06" class="refDate">June 2015</time>, <span>&lt;<a href="https://developer.apple.com/videos/play/wwdc2015/719/?time=2199">https://developer.apple.com/videos/play/wwdc2015/719/?time=2199</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="Herbert">[Herbert]</dt>
+        <dd>
+<span class="refAuthor">Tom Herbert</span>, <span class="refTitle">"Byte Queue Limits: the unauthorized biography"</span>, <time datetime="2025-01" class="refDate">January 2025</time>, <span>&lt;<a href="https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83">https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="Hruby">[Hruby]</dt>
+        <dd>
+<span class="refAuthor">Tomáš Hrubý</span>, <span class="refTitle">"Byte Queue Limits"</span>, <time datetime="2012-08" class="refDate">August 2012</time>, <span>&lt;<a href="https://blog.linuxplumbersconf.org/2012/wp-content/uploads/2012/08/bql_slide.pdf">https://blog.linuxplumbersconf.org/2012/wp-content/uploads/2012/08/bql_slide.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="MMADAPT">[MMADAPT]</dt>
         <dd>
 <span class="refAuthor">Aiman Erbad</span> and <span class="refAuthor">Charles Buck Krasic</span>, <span class="refTitle">"Sender-side buffers and the case for multimedia adaptation"</span>, <span class="seriesInfo">ACM Queue, Volume 10, issue 10 </span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://queue.acm.org/detail.cfm?id=2381998">https://queue.acm.org/detail.cfm?id=2381998</a>&gt;</span>. </dd>
@@ -2351,8 +2366,12 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-10-1
 <span class="refAuthor">Paasch, C.</span>, <span class="refAuthor">Meyer, R.</span>, <span class="refAuthor">Cheshire, S.</span>, and <span class="refAuthor">W. Hawkins</span>, <span class="refTitle">"Responsiveness under Working Conditions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ippm-responsiveness-05</span>, <time datetime="2024-10-21" class="refDate">21 October 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-05">https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-05</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TCPFR">[TCPFR]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Cheshire, S.</span>, <span class="refTitle">"Ruckus WiFi Evaluation"</span>, <time datetime="2006-04" class="refDate">April 2006</time>, <span>&lt;<a href="http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf">http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="THJ">[THJ]</dt>
+      <dd>
+<span class="refAuthor">Toke Høiland-Jørgensen</span>, <span class="refTitle">"The State of the Art in Bufferbloat Testing and Reduction on Linux"</span>, <time datetime="2013-03" class="refDate">March 2013</time>, <span>&lt;<a href="https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf">https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
