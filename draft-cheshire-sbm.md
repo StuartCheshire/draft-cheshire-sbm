@@ -70,6 +70,7 @@ informative:
     date: June 2015
     seriesinfo: Apple Worldwide Developer Conference
     target: https://developer.apple.com/videos/play/wwdc2015/719/?time=2199
+  RPM: I-D.ietf-ippm-responsiveness
   MMADAPT:
     author:
      - ins: Aiman Erbad
@@ -78,6 +79,7 @@ informative:
     date: October 2012
     seriesinfo: ACM Queue, Volume 10, issue 10
     target: https://queue.acm.org/detail.cfm?id=2381998
+  RFC792:
   RFC3168:
   RFC5681:
   RFC6143:
@@ -853,6 +855,30 @@ may itself not be a real-time delay-sensitive application,
 but a transport protocol itself is most definitely a
 delay-sensitive application, responding in real time
 to changing network conditions.
+
+# Experimental Validation
+
+The mechanisms described in this document do not exist
+for purely ideological or philosophical reasons.
+Any work to improve source buffer management in end systems
+should be validated by confirming that real-world applications
+exhibit verifiably improved responsiveness, and by taking
+measurements using benchmark tools that measure application-layer
+round-trip times under realistic working conditions {{RPM}}.
+Using the ‘ping’ command to send one ICMP Echo packet {{RFC792}}
+per second on an otherwise idle network is not a good
+predictor of real-world application performance.
+Testing the scenario where the outgoing buffer is
+almost always completely empty due to lack of traffic
+does not reveal anything about how it will perform
+when a nontrivial amount of data is being sent and
+the buffer is no longer empty.
+The quality of the source buffer management policy
+and the effectiveness of its backpressure mechanisms
+only become apparent when a source of the data is
+willing and able to exceed the available network capacity,
+and the backpressure mechanisms are required
+to regulate the rate that data is being sent.
 
 # Alternative Proposals
 
