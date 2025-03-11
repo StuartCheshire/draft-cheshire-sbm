@@ -70,20 +70,6 @@ informative:
     date: June 2015
     seriesinfo: Apple Worldwide Developer Conference
     target: https://developer.apple.com/videos/play/wwdc2015/719/?time=2199
-  TCPFR:
-    author:
-     - ins: S. Cheshire
-    title: "Ruckus WiFi Evaluation"
-    date: April 2006
-    target: http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf
-  RFC3168:
-  RFC5681:
-  RFC6143:
-  RFC8033:
-  RFC8290:
-  RFC9000:
-  RFC9330:
-  RFC9369:
   MMADAPT:
     author:
      - ins: Aiman Erbad
@@ -92,6 +78,20 @@ informative:
     date: October 2012
     seriesinfo: ACM Queue, Volume 10, issue 10
     target: https://queue.acm.org/detail.cfm?id=2381998
+  RFC3168:
+  RFC5681:
+  RFC6143:
+  RFC8033:
+  RFC8290:
+  RFC9000:
+  RFC9330:
+  RFC9369:
+  TCPFR:
+    author:
+     - ins: S. Cheshire
+    title: "Ruckus WiFi Evaluation"
+    date: April 2006
+    target: http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf
 
 --- abstract
 
