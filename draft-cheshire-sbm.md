@@ -800,10 +800,13 @@ of direct backpressure for first hop bottlenecks.
 
 It is important to understand that these
 backpressure mechanisms at the API layer are not new.
-They have existed by necessity for as long as we have had
+By necessity, backpressure has existed for as long as we have had
 networking APIs (or serial port APIs, or file system APIs, etc.).
-The problem with these APIs has been that historically
-these backpressure mechanisms were exercised too late,
+All applications have always had to be prevented from generating
+a sustained stream of data faster than the medium can consume it.
+The problem is not that backpressure mechanisms
+did not exist, but that historically these
+backpressure mechanisms were exercised far too late,
 after an excessive backlog had already built up.
 
 The proposal in this Source Buffer Management
