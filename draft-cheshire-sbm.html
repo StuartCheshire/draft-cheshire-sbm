@@ -1471,10 +1471,12 @@ which has an upstream output rate of 35Mb/s over the coaxial cable.<a href="#sec
   -----   600            1              1             35
  |  P  |  Mb/s          Gb/s           Gb/s          Mb/s
  |  h  |        ------        -------        ------
- |  o  |-------|  AP  |------|  NAT  |------|  CM  |------&gt; Internet
+ |  o  |------&gt;|  AP  |-----&gt;|  NAT  |-----&gt;|  CM  |------&gt; Internet
  |  n  |        ------        -------        ------
- |  e  |
-  -----
+ |  e  |                                        ^
+  -----                                       Queue
+    ^                                         forms
+Source of data                                here
 </pre><a href="#section-3.2-4" class="pilcrow">¶</a>
 </div>
 <p id="section-3.2-5">When the cable modem experiences

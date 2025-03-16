@@ -261,10 +261,12 @@ Table of Contents
      -----   600            1              1             35
     |  P  |  Mb/s          Gb/s           Gb/s          Mb/s
     |  h  |        ------        -------        ------
-    |  o  |-------|  AP  |------|  NAT  |------|  CM  |------> Internet
+    |  o  |------>|  AP  |----->|  NAT  |----->|  CM  |------> Internet
     |  n  |        ------        -------        ------
-    |  e  |
-     -----
+    |  e  |                                        ^
+     -----                                       Queue
+       ^                                         forms
+   Source of data                                here
 
    When the cable modem experiences an excessive flow of incoming
    packets arriving on its gigabit Ethernet interface, the cable modem
