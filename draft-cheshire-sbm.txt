@@ -33,6 +33,11 @@ About This Document
    sbm.html.  Status information for this document may be found at
    https://datatracker.ietf.org/doc/draft-cheshire-sbm/.
 
+   Discussion of this document takes place on the sbm Working Group
+   mailing list (mailto:sbm@ietf.org), which is archived at
+   https://mailarchive.ietf.org/arch/browse/sbm/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/sbm/.
+
    Source for this draft and an issue tracker can be found at
    https://github.com/StuartCheshire/draft-cheshire-sbm.
 
@@ -89,7 +94,7 @@ Table of Contents
    9.  Alternative Proposals
      9.1.  Just use UDP
      9.2.  Packet Expiration
-     9.3.  Head of Line Blocking / Traffic Priorities
+     9.3.  Traffic Priorities / Head of Line Blocking
    10. Security Considerations
    11. IANA Considerations
    12. References
@@ -135,13 +140,16 @@ Table of Contents
    connections using BSD Sockets, and its equivalent for other
    networking protocols and APIs.
 
-   The goal is for application software to be able to write chunks of
-   data large enough to be efficient, without writing too many of them
-   too quickly.  This avoids the unfortunate situation where a delay-
-   sensitive application inadvertently writes many blocks of data long
-   before they will actually depart the source machine, such that by the
-   time the enqueued data is actually sent, the application may have
-   newer data that it would rather send instead.  By deferring
+   The goal is to define a cross-platform and cross-protocol mechanism
+   that informs application software when it is a good time to generate
+   new data, and when the application software might want to refrain
+   from generating new data, enabling the application software to write
+   chunks of data large enough to be efficient, without writing too many
+   of them too quickly.  This avoids the unfortunate situation where a
+   delay-sensitive application inadvertently writes many blocks of data
+   long before they will actually depart the source machine, such that
+   by the time the enqueued data is actually sent, the application may
+   have newer data that it would rather send instead.  By deferring
    generating data until the networking code is actually ready to send
    it, the application retains more precise control over what data will
    be sent when the opportunity arises.
@@ -266,9 +274,9 @@ Table of Contents
 
    Security and trust concerns revolve around preventing a malicious
    entity from performing a denial-of-service attack against a victim
-   device by sending fraudulent messages that would cause it to reduce
-   its transmission rate.  It is particularly important to guard against
-   an off-path attacker being able to do this.  This concern is
+   device, by sending fraudulent messages that would cause the victim to
+   reduce its transmission rate.  It is particularly important to guard
+   against an off-path attacker being able to do this.  This concern is
    addressed if queue size feedback generated in the network follows the
    same path already taken by the data packets and their subsequent
    acknowledgement packets.  The logic is that any on-path device that
@@ -276,7 +284,7 @@ Table of Contents
    header) could equally well corrupt packets or discard them entirely.
    Thus, trusting ECN information from these devices does not increase
    security concerns, since these devices could already perform more
-   malicious actions anyway.  The sender already trusts the receiver to
+   damaging actions anyway.  The sender already trusts the receiver to
    generate accurate acknowledgement packets, so also trusting it to
    report ECN information back to the sender does not increase the
    security risk.
@@ -337,7 +345,7 @@ Table of Contents
    the ability for sending software (like the VNC RFB server) to specify
    a low-water-mark threshold for the minimum amount of *unsent* data it
    would like to have waiting in the socket send buffer.  Instead of
-   encouraging the application to fill the socket send buffer to its
+   inviting the application to fill the socket send buffer to its
    maximum capacity, the socket send buffer would hold just the data
    that had been sent but not yet acknowledged (enough to fully occupy
    the bandwidth-delay product of the network path and fully utilize the
@@ -411,14 +419,19 @@ Table of Contents
    anticipated needing to generate its next logical block of data.
 
    The application could perform this calculation itself, calculating
-   the estimated current data rate and dividing that by its desired
+   the estimated current data rate and multiplying that by its desired
    advance notice time, to compute the number of outstanding unsent
-   bytes corresponding to that desired time.  However, the application
-   would have to keep adjusting its TCP_NOTSENT_LOWAT value as the
-   observed data rate changed.  Since the transport protocol already
-   knows the number of unacknowledged bytes in flight, and the current
-   round-trip delay, the transport protocol is in a better position to
-   perform this calculation.
+   bytes corresponding to that desired time.  For example, if the
+   current average data rate is 1 megabyte per second, and the
+   application would like 0.1 seconds warning before the backlog of
+   awaiting data runs out, then 1,000,000 x 0.1 gives us a
+   TCP_NOTSENT_LOWAT value of 100,000 bytes.
+
+   However, the application would have to keep adjusting its
+   TCP_NOTSENT_LOWAT value as the observed data rate changed.  Since the
+   transport protocol already knows the number of unacknowledged bytes
+   in flight, and the current round-trip delay, the transport protocol
+   is in a better position to perform this calculation.
 
    In addition, the network stack knows if features like hardware
    offload, aggregation, and stretch acks are being used, which could
@@ -465,7 +478,7 @@ Table of Contents
    The new TCP_REPLENISH_TIME socket option specifies the threshold for
    notifying an application of impending data exhaustion in terms of
    microseconds, not bytes.  It is the job of the transport protocol to
-   compute its best estimate of when the amount of remaining unsent data
+   compute its best estimate of when the expected time-to-exhaustion
    falls below this threshold.
 
    The new TCP_REPLENISH_TIME socket option should have the same
@@ -512,17 +525,17 @@ Table of Contents
    incorrect first impressions then their thinking about the concept may
    be adversely affected.
 
-   For example, the BSD socket option could be called
-   “TCP_REPLENISH_TIME” or “TCP_EXHAUSTION_TIME”. These are two sides of
-   the same coin.  From the application’s point of view, it is
-   expressing how much time it will require to replenish the buffer.
-   From the networking code’s point of view, it is estimating how much
-   time remains before it will need the buffer replenished.  In an ideal
-   world, REPLENISH_TIME == EXHAUSTION_TIME, so that the data is
-   replenished at exactly the moment the networking code needs it.  In a
-   sense, they are two ways of saying the same thing.  Since this API
-   call is made by the application, we feel it should be expressed in
-   terms of the application’s requirement.
+   For example, one suggested name was “TCP_EXHAUSTION_TIME”. We view
+   “TCP_REPLENISH_TIME” and “TCP_EXHAUSTION_TIME” as representing two
+   interpretations of the same quantity.  From the application’s point
+   of view, it is expressing how much time it will require to replenish
+   the buffer.  From the networking code’s point of view, it is
+   estimating how much time remains before it will need the buffer
+   replenished.  In an ideal world, REPLENISH_TIME == EXHAUSTION_TIME,
+   so that the data is replenished at exactly the moment the networking
+   code needs it.  In a sense, they are two ways of saying the same
+   thing.  Since this API call is made by the application, we feel it
+   should be expressed in terms of the application’s requirement.
 
 7.  Applicability
 
@@ -603,8 +616,8 @@ Table of Contents
 
    Whether the source application is constrained by a physical
    bottleneck on the sending device, or by an algorithmic bottleneck on
-   the sending device, the benefits of not overcommitting data to the
-   outgoing buffer are similar.
+   the sending device, it is still beneficial to avoid overcommitting
+   data to the outgoing buffer.
 
    As described in the introduction, the goal is for the application
    software to be able to write chunks of data large enough to be
@@ -614,18 +627,18 @@ Table of Contents
 7.3.  Superiority of Direct Backpressure
 
    Since multi-hop network protocols already implement indirect
-   backpressure in the form of discarding or marking packets, it can be
-   tempting to use the same mechanism to generate backpressure for
-   first-hop physical bottlenecks.  Superficially there might seem to be
-   some attractive elegance in having the first hop use the same drop/
-   mark mechanism as the remaining hops on the path.  However, this is
-   not an ideal solution because indirect backpressure from the network
-   is very crude compared to the much richer direct backpressure that is
-   available within the sending device itself.  Relying on indirect
-   backpressure by discarding or marking a packet in the sending device
-   itself is a crude rate-control signal, because it takes a full
-   network round-trip time before the effect of that drop or mark is
-   observed at the receiver and echoed back to the sender, and it may
+   backpressure signalling in the form of discarding or marking packets,
+   it can be tempting to use the same mechanism to generate backpressure
+   for first-hop physical bottlenecks.  Superficially there might seem
+   to be some attractive elegance in having the first hop use the same
+   drop/mark mechanism as the remaining hops on the path.  However, this
+   is not an ideal solution because indirect backpressure from the
+   network is very crude compared to the much richer direct backpressure
+   that is available within the sending device itself.  Relying on
+   indirect backpressure by discarding or marking a packet in the
+   sending device is a crude rate-control signal, because it takes a
+   full network round-trip time before the effect of that drop or mark
+   is observed at the receiver and echoed back to the sender, and it may
    take multiple such round trips before it finally results in an
    appropriate reduction in sending rate.
 
@@ -648,6 +661,12 @@ Table of Contents
    (iii) When flow control is implemented via a local software API, the
    delivery of STOP/GO information to the source is immediate.
 
+   Furthermore, the situation where the bottleneck is the first hop of
+   the path is a fairly common case, and it is the case where indirect
+   backpressure is at its worst (it takes an entire network round trip
+   to learn what is already known on the sending device), so it is
+   worthwhile optimizing for this common case.
+
    Direct backpressure can be achieved simply making an API call block,
    or by returning a Unix EWOULDBLOCK error, or using equivalent
    mechanisms in other APIs, and has the effect of immediately halting
@@ -663,14 +682,6 @@ Table of Contents
    alternatives are not available.  Direct backpressure is vastly
    superior, and where direct backpressure mechanisms are possible they
    should be preferred over indirect backpressure mechanisms.
-
-   While there might seem to be some attractive elegance to using
-   indirect backpressure for all hops in the network, having the first
-   hop be the bottleneck is a common case, and that is the case where
-   indirect backpressure is at its worst (it takes an entire network
-   round trip to learn what is already known on the sending device), so
-   the benefits mean that it is worth optimizing for this common case
-   and making use of direct backpressure for first hop bottlenecks.
 
 7.4.  Application Programming Interface
 
@@ -746,6 +757,12 @@ Table of Contents
    itself not be a real-time delay-sensitive application, but a
    transport protocol itself is most definitely a delay-sensitive
    application, responding in real time to changing network conditions.
+   The application doing the large bulk data transfer may have no need
+   to use TCP_REPLENISH_TIME to manage its own application-layer
+   backlog, but the transport protocol it is using (e.g., TCP or QUIC)
+   obtains significant benefit from receiving timely direct backpressure
+   from the driver and hardware below to keep the network round-trip
+   time low.
 
 8.  Experimental Validation
 
@@ -765,7 +782,8 @@ Table of Contents
    policy and the effectiveness of its backpressure mechanisms only
    become apparent when a source of the data is willing and able to
    exceed the available network capacity, and the backpressure
-   mechanisms are required to regulate the rate that data is being sent.
+   mechanisms become operational to regulate the rate that data is being
+   sent.
 
 9.  Alternative Proposals
 
@@ -834,20 +852,20 @@ Table of Contents
    display that frame, but also in the construction of subsequent
    frames.
 
-9.3.  Head of Line Blocking / Traffic Priorities
+9.3.  Traffic Priorities / Head of Line Blocking
 
    People are often very concerned about the problem of head-of-line-
    blocking, and propose to solve it using techniques such as packet
    priorities, the ability cancel unsent pending messages [MMADAPT], and
    out-of-order delivery on the receiving side.  There is an unconscious
    unstated assumption baked into this line of reasoning, which is that
-   having an excessively long queue is inevitable and unavoidable, and
-   therefore we have to devote a lot of our energy into how to organize
-   and prioritize and manage that obligatory excessive queue.  In
-   contrast, if we take steps to keep queues short, the problems of
-   head-of-line-blocking largely go away.  When the line is consistently
-   short, being at the back of the line is no longer the serious problem
-   that it used to be.
+   having an excessively long outgoing queue is inevitable and
+   unavoidable, and therefore we have to devote a lot of our energy into
+   how to organize and prioritize and manage that obligatory excessive
+   queue.  In contrast, if we take steps to keep queues short, the
+   problems of head-of-line-blocking largely go away.  When the line is
+   consistently short, being at the back of the line is no longer the
+   serious problem that it used to be.
 
    On the receiving device, if a single packet is lost, then subsequent
    data cannot be delivered to the receiving application in-order until
@@ -878,7 +896,12 @@ Table of Contents
    software that will correctly handle gaps in the data.  For example,
    in a compressed video stream where a frame is encoded as differences
    relative to the previous frame, there is no easy way to decode the
-   current frame when the previous frame is missing.
+   current frame when the previous frame is missing.  This scenario has
+   many similarities to Packet Expiration (Section 9.2) except that when
+   using Packet Expiration the data loss is intentional and self-
+   inflicted, whereas out-of-order delivery encompasses both the case of
+   intentional packet loss by the sender and inadvertent packet loss in
+   the network.
 
    In a network using L4S [RFC9330] the motivation for writing extremely
    complicated software to handle out-of-order delivery (i.e., data with
@@ -893,9 +916,10 @@ Table of Contents
    relative to the user-experience requirements of the application.  For
    example, for distributing real-time audio within a home network,
    where round-trip delays over the local Ethernet or Wi-Fi network are
-   just a few milliseconds, using Fast Retransmit to recover occasional
-   lost packets within a few milliseconds [TCPFR] makes the application
-   programming easy and is preferable to playing degraded audio due to
+   just a few milliseconds, simply relying on Fast Retransmit to recover
+   occasional lost packets within a few milliseconds [TCPFR] makes the
+   application programming easier and is preferable to accepting
+   received data out of order and then playing degraded audio due to
    gaps in the data stream.  To give some calibration, the speed of
    sound in air is roughly one foot per millisecond, so a 5 ms playback
    delay buffer to allow for loss recovery equates to the same delay as
@@ -1035,10 +1059,11 @@ Acknowledgments
 
    This document has benefited from input and suggestions from: Chris
    Box, Morten Brørup, Neal Cardwell, Yuchung Cheng, Eric Dumazet,
-   Sebastian Moeller, Christoph Paasch, Kevin Smith, Ian Swett, all who
-   joined the side meeting at IETF 121 in Dublin (November 2024), and
-   others [please don’t be shy about reminding me if I somehow missed
-   your name].
+   Jonathan Lennox, Sebastian Moeller, Yoshifumi Nishida, Christoph
+   Paasch, Kevin Smith, Ian Swett, Michael Welzl, all who joined the
+   side meeting at IETF 121 in Dublin (November 2024), and others
+   [please don’t be shy about reminding me if I somehow missed your
+   name].
 
 Author's Address
 
