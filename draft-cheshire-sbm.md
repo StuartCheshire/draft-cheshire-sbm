@@ -99,6 +99,7 @@ informative:
   RFC9000:
   RFC9330:
   RFC9369:
+  RFC9622:
   RPM: I-D.ietf-ippm-responsiveness
   TCPFR:
     author:
@@ -601,6 +602,15 @@ mechanism to avoid an excessive backlog of unsent data is
 dramatically better than having no such mechanism at all.
 Occasional overestimates or underestimates do not
 negate the benefit of this capability.
+
+The IETF Transport Services API specification {{RFC9622}}
+states that “Sent events allow an application to obtain
+an understanding of the amount of buffering it creates.”
+TCP\_REPLENISH\_TIME goes beyond
+giving an application **visibility**
+into the amount of buffering it creates,
+by giving an application the ability to **specify**
+the amount of buffering it would **like** to create.
 
 ## Solicitation for Name Suggestions
 
