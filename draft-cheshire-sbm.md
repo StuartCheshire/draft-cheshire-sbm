@@ -311,10 +311,12 @@ which has an upstream output rate of 35Mb/s over the coaxial cable.
   -----   600            1              1             35
  |  P  |  Mb/s          Gb/s           Gb/s          Mb/s
  |  h  |        ------        -------        ------
- |  o  |-------|  AP  |------|  NAT  |------|  CM  |------> Internet
+ |  o  |------>|  AP  |----->|  NAT  |----->|  CM  |------> Internet
  |  n  |        ------        -------        ------
- |  e  |
-  -----
+ |  e  |                                        ^
+  -----                                       Queue
+    ^                                         forms
+Source of data                                here
 ~~~~
 
 When the cable modem experiences
