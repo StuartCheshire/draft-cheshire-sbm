@@ -306,6 +306,17 @@ a smartphone communicating via a Wi-Fi Access Point at 600 Mb/s,
 which is connected to a home NAT gateway via gigabit Ethernet,
 which is connected to a cable modem via gigabit Ethernet,
 which has an upstream output rate of 35Mb/s over the coaxial cable.
+
+~~~~
+  -----   600            1              1             35
+ |  P  |  Mb/s          Gb/s           Gb/s          Mb/s
+ |  h  |        ------        -------        ------
+ |  o  |-------|  AP  |------|  NAT  |------|  CM  |------> Internet
+ |  n  |        ------        -------        ------
+ |  e  |
+  -----
+~~~~
+
 When the cable modem experiences
 an excessive flow of incoming packets arriving
 on its gigabit Ethernet interface,
@@ -705,9 +716,9 @@ waking up the process to replenish the data.
 This allows the process to do a
 relatively small number of efficient 500-kilobyte writes
 instead of a huge number of little 3-kilobyte writes.
-[Author’s note: I would appreciate a confirmation
+\[Author’s note: I would appreciate a confirmation
 that this is correct, with a reference, or alternatively
-inform me if this is wrong and I will remove it.]
+inform me if this is wrong and I will remove it.\]
 
 In this way the application is able to keep a
 reasonable amount of data waiting in the outgoing buffer,
