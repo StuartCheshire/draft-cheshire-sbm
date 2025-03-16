@@ -647,6 +647,140 @@ In a sense, they are two ways of saying the same thing.
 Since this API call is made by the application, we feel it
 should be expressed in terms of the application’s requirement.
 
+# Application Guidance
+
+## Program Structure
+
+For an application that wishes to achieve good throughput
+while also caring about the timeliness of its data,
+the recommendation is that the application use the
+“TCP\_REPLENISH\_TIME” socket option (or equivalent)
+to specify how much time it expects it will need
+to generate its next batch of data.
+
+After setting TCP\_REPLENISH\_TIME for a connection,
+the application then uses a notification API like
+kevent() on Mac OS (or equivalents on other platforms)
+to block and wait until the networking code determines
+that it is time to generate new data for that connection.
+Immediately after the creation of a new connection,
+kevent() (or equivalent) will immediately report that
+it is ready for more data. Once the application has
+written enough data to build up a sufficient backlog of
+unsent data waiting on the source device, kevent() will stop
+indicating that it is inviting the application to write more data.
+Once the backlog of unsent data drains to the point
+where the networking code expects it to be exhausted
+in less than the time specified by TCP\_REPLENISH\_TIME
+for that connection, kevent() again reports the socket
+as writable to invite the application to generate its
+next batch of data.
+
+It is important to note that the kevent() signal indicating
+that it is time to generate new data is a hint to the application.
+The presence of the kevent() signal tells the application
+that this is a good time to generate new data;
+the absence of the kevent() signal is **not**
+a **prohibition** on the application writing more data.
+Even if kevent() is not signalling impending exhaustion
+of the data buffer, an application is still free to write
+as much data as is appropriate for that application
+(potentially limited by some other parameter,
+such as the SO_SNDBUF size in BSD Sockets).
+
+Note that there is precendent for this
+kind of behavior in current programming APIs.
+For example, if a TCP connection on Linux
+has a socket send buffer of 1000 kilobytes,
+and a TCP ACK packet arrives
+acknowledging 3 kilobytes of data,
+leaving only 997 kilobytes of data
+remaining in the socket send buffer,
+then epoll() will not immediately wake up
+the process to replenish the data and fill
+the buffer back up to the full 1000 kilobytes.
+Instead Linux will wait until the socket send
+buffer occupancy has fallen to 50% before
+waking up the process to replenish the data.
+This allows the process to do a
+relatively small number of efficient 500-kilobyte writes
+instead of a huge number of little 3-kilobyte writes.
+[Author’s note: I would appreciate a confirmation
+that this is correct, with a reference, or alternatively
+inform me if this is wrong and I will remove it.]
+
+In this way the application is able to keep a
+reasonable amount of data waiting in the outgoing buffer,
+without building too much backlog resulting in excessive delay.
+
+## Selection of TCP\_REPLENISH\_TIME value
+
+The selection of the appropriate TCP\_REPLENISH\_TIME value
+depends on the application’s needs.
+
+For example, a screen sharing server (or a video streaming source)
+sending data at 60 frames per second may require 17 milliseconds
+between when it grabs the frame from the screen (or camera),
+compresses it, and has the data ready for transmission.
+Such an application might specify a TCP\_REPLENISH\_TIME
+of 20 milliseconds, so give reasonable confidence that
+it will have the next frame prepared and ready before
+the transport protocol finishes sending the previous frame.
+If the video capture process is more pipelined,
+so that it takes the application 17 milliseconds
+to capture the frame from the camera,
+and then a further 17 milliseconds to compress that frame,
+then it might specify a TCP\_REPLENISH\_TIME of 35 milliseconds.
+
+For an application that cares most about
+achieving the highest possible video quality,
+and a little extra delay is not a serious problem,
+it may be appropriate to specify a slightly higher
+TCP\_REPLENISH\_TIME to ensure a slightly higher safety
+margin and reduce the risk of the transport protocol
+occasionally becoming starved of new data.
+
+For an application that cares most about
+getting the lowest possible delay rather than
+achieving the highest utilization of available network capacity,
+it may be appropriate to specify a slightly lower
+TCP\_REPLENISH\_TIME to keep buffering delay to
+a minimum, at the risk of occasionally leaving
+some amount of network capacity unused.
+
+Continuing the example of the video streaming application,
+if a given frame has a lot of movement relative to the
+previous frame, then the video compression algorithm
+can be set either to encode the frame at lower quality
+(yielding the same compressed data size)
+or at the same quality
+(yielding a larger compressed data size).
+In the latter case, if the compressed data size is
+three times larger than a typical compressed frame,
+the application can still write that larger block of data.
+The write is not prevented or blocked just because
+it exceeds the desired TCP\_REPLENISH\_TIME budget.
+After writing this larger block of data
+kevent() (or equivalent) will not signal
+that it is ready for more data
+until after the large block has drained,
+which may take more than one typical frame time.
+In this way the kevent() loop has the effect of
+automatically reducing the frame rate to stay within
+the available network capacity, instead of continuing
+to generate frames faster than the network can carry
+them and building up an increasing backlog
+(with a corresponding increasing delay).
+The application may accept this reduced frame rate,
+or it may choose to adjust its video compression algorithm
+to a lower quality so as to increase the frame rate.
+In either case, the source device buffering delay
+is kept under control.
+
+In all cases, it is expected that application writers will
+experiment with different values of TCP\_REPLENISH\_TIME to
+determine empirically what works best for their application.
+
 # Applicability
 
 This time-based backlog management is applicable anywhere
