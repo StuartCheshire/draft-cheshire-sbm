@@ -1754,6 +1754,14 @@ mechanism to avoid an excessive backlog of unsent data is
 dramatically better than having no such mechanism at all.
 Occasional overestimates or underestimates do not
 negate the benefit of this capability.<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">The IETF Transport Services API specification <span>[<a href="#RFC9622" class="cite xref">RFC9622</a>]</span>
+states that “Sent events allow an application to obtain
+an understanding of the amount of buffering it creates.”
+TCP_REPLENISH_TIME goes beyond
+giving an application <strong>visibility</strong>
+into the amount of buffering it creates,
+by giving an application the ability to <strong>specify</strong>
+the amount of buffering it would <strong>like</strong> to create.<a href="#section-6-6" class="pilcrow">¶</a></p>
 <div id="solicitation-for-name-suggestions">
 <section id="section-6.1">
         <h3 id="name-solicitation-for-name-sugge">
@@ -2363,6 +2371,10 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-10-1
 <dt id="RFC9369">[RFC9369]</dt>
         <dd>
 <span class="refAuthor">Duke, M.</span>, <span class="refTitle">"QUIC Version 2"</span>, <span class="seriesInfo">RFC 9369</span>, <span class="seriesInfo">DOI 10.17487/RFC9369</span>, <time datetime="2023-05" class="refDate">May 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9369">https://www.rfc-editor.org/rfc/rfc9369</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC9622">[RFC9622]</dt>
+        <dd>
+<span class="refAuthor">Trammell, B., Ed.</span>, <span class="refAuthor">Welzl, M., Ed.</span>, <span class="refAuthor">Enghardt, R.</span>, <span class="refAuthor">Fairhurst, G.</span>, <span class="refAuthor">Kühlewind, M.</span>, <span class="refAuthor">Perkins, C. S.</span>, <span class="refAuthor">Tiesel, P.S.</span>, and <span class="refAuthor">T. Pauly</span>, <span class="refTitle">"An Abstract Application Programming Interface (API) for Transport Services"</span>, <span class="seriesInfo">RFC 9622</span>, <span class="seriesInfo">DOI 10.17487/RFC9622</span>, <time datetime="2025-01" class="refDate">January 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9622">https://www.rfc-editor.org/rfc/rfc9622</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RPM">[RPM]</dt>
         <dd>

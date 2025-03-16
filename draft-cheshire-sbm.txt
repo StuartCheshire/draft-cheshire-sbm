@@ -495,6 +495,13 @@ Table of Contents
    all.  Occasional overestimates or underestimates do not negate the
    benefit of this capability.
 
+   The IETF Transport Services API specification [RFC9622] states that
+   “Sent events allow an application to obtain an understanding of the
+   amount of buffering it creates.” TCP_REPLENISH_TIME goes beyond
+   giving an application *visibility* into the amount of buffering it
+   creates, by giving an application the ability to *specify* the amount
+   of buffering it would *like* to create.
+
 6.1.  Solicitation for Name Suggestions
 
    Author’s note: The BSD socket option name “TCP_REPLENISH_TIME” is
@@ -1000,6 +1007,13 @@ Table of Contents
    [RFC9369]  Duke, M., "QUIC Version 2", RFC 9369,
               DOI 10.17487/RFC9369, May 2023,
               <https://www.rfc-editor.org/rfc/rfc9369>.
+
+   [RFC9622]  Trammell, B., Ed., Welzl, M., Ed., Enghardt, R.,
+              Fairhurst, G., Kühlewind, M., Perkins, C. S., Tiesel,
+              P.S., and T. Pauly, "An Abstract Application Programming
+              Interface (API) for Transport Services", RFC 9622,
+              DOI 10.17487/RFC9622, January 2025,
+              <https://www.rfc-editor.org/rfc/rfc9622>.
 
    [RPM]      Paasch, C., Meyer, R., Cheshire, S., and W. Hawkins,
               "Responsiveness under Working Conditions", Work in
