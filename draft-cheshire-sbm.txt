@@ -83,23 +83,26 @@ Table of Contents
      5.3.  Other Transport Protocols
    6.  TCP_REPLENISH_TIME
      6.1.  Solicitation for Name Suggestions
-   7.  Applicability
-     7.1.  Physical Bottlenecks
-     7.2.  Algorithmic Bottlenecks
-     7.3.  Superiority of Direct Backpressure
-     7.4.  Application Programming Interface
-     7.5.  Relationship Between Throughput and Delay
-     7.6.  Bulk Transfer Protocols
-   8.  Experimental Validation
-   9.  Alternative Proposals
-     9.1.  Just use UDP
-     9.2.  Packet Expiration
-     9.3.  Traffic Priorities / Head of Line Blocking
-   10. Security Considerations
-   11. IANA Considerations
-   12. References
-     12.1.  Normative References
-     12.2.  Informative References
+   7.  Application Guidance
+     7.1.  Program Structure
+     7.2.  Selection of TCP_REPLENISH_TIME value
+   8.  Applicability
+     8.1.  Physical Bottlenecks
+     8.2.  Algorithmic Bottlenecks
+     8.3.  Superiority of Direct Backpressure
+     8.4.  Application Programming Interface
+     8.5.  Relationship Between Throughput and Delay
+     8.6.  Bulk Transfer Protocols
+   9.  Experimental Validation
+   10. Alternative Proposals
+     10.1.  Just use UDP
+     10.2.  Packet Expiration
+     10.3.  Traffic Priorities / Head of Line Blocking
+   11. Security Considerations
+   12. IANA Considerations
+   13. References
+     13.1.  Normative References
+     13.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -537,12 +540,121 @@ Table of Contents
    thing.  Since this API call is made by the application, we feel it
    should be expressed in terms of the application’s requirement.
 
-7.  Applicability
+7.  Application Guidance
+
+7.1.  Program Structure
+
+   For an application that wishes to achieve good throughput while also
+   caring about the timeliness of its data, the recommendation is that
+   the application use the “TCP_REPLENISH_TIME” socket option (or
+   equivalent) to specify how much time it expects it will need to
+   generate its next batch of data.
+
+   After setting TCP_REPLENISH_TIME for a connection, the application
+   then uses a notification API like kevent() on Mac OS (or equivalents
+   on other platforms) to block and wait until the networking code
+   determines that it is time to generate new data for that connection.
+   Immediately after the creation of a new connection, kevent() (or
+   equivalent) will immediately report that it is ready for more data.
+   Once the application has written enough data to build up a sufficient
+   backlog of unsent data waiting on the source device, kevent() will
+   stop indicating that it is inviting the application to write more
+   data.  Once the backlog of unsent data drains to the point where the
+   networking code expects it to be exhausted in less than the time
+   specified by TCP_REPLENISH_TIME for that connection, kevent() again
+   reports the socket as writable to invite the application to generate
+   its next batch of data.
+
+   It is important to note that the kevent() signal indicating that it
+   is time to generate new data is a hint to the application.  The
+   presence of the kevent() signal tells the application that this is a
+   good time to generate new data; the absence of the kevent() signal is
+   *not* a *prohibition* on the application writing more data.  Even if
+   kevent() is not signalling impending exhaustion of the data buffer,
+   an application is still free to write as much data as is appropriate
+   for that application (potentially limited by some other parameter,
+   such as the SO_SNDBUF size in BSD Sockets).
+
+   Note that there is precendent for this kind of behavior in current
+   programming APIs.  For example, if a TCP connection on Linux has a
+   socket send buffer of 1000 kilobytes, and a TCP ACK packet arrives
+   acknowledging 3 kilobytes of data, leaving only 997 kilobytes of data
+   remaining in the socket send buffer, then epoll() will not
+   immediately wake up the process to replenish the data and fill the
+   buffer back up to the full 1000 kilobytes.  Instead Linux will wait
+   until the socket send buffer occupancy has fallen to 50% before
+   waking up the process to replenish the data.  This allows the process
+   to do a relatively small number of efficient 500-kilobyte writes
+   instead of a huge number of little 3-kilobyte writes.  [Author’s
+   note: I would appreciate a confirmation that this is correct, with a
+   reference, or alternatively inform me if this is wrong and I will
+   remove it.]
+
+   In this way the application is able to keep a reasonable amount of
+   data waiting in the outgoing buffer, without building too much
+   backlog resulting in excessive delay.
+
+7.2.  Selection of TCP_REPLENISH_TIME value
+
+   The selection of the appropriate TCP_REPLENISH_TIME value depends on
+   the application’s needs.
+
+   For example, a screen sharing server (or a video streaming source)
+   sending data at 60 frames per second may require 17 milliseconds
+   between when it grabs the frame from the screen (or camera),
+   compresses it, and has the data ready for transmission.  Such an
+   application might specify a TCP_REPLENISH_TIME of 20 milliseconds, so
+   give reasonable confidence that it will have the next frame prepared
+   and ready before the transport protocol finishes sending the previous
+   frame.  If the video capture process is more pipelined, so that it
+   takes the application 17 milliseconds to capture the frame from the
+   camera, and then a further 17 milliseconds to compress that frame,
+   then it might specify a TCP_REPLENISH_TIME of 35 milliseconds.
+
+   For an application that cares most about achieving the highest
+   possible video quality, and a little extra delay is not a serious
+   problem, it may be appropriate to specify a slightly higher
+   TCP_REPLENISH_TIME to ensure a slightly higher safety margin and
+   reduce the risk of the transport protocol occasionally becoming
+   starved of new data.
+
+   For an application that cares most about getting the lowest possible
+   delay rather than achieving the highest utilization of available
+   network capacity, it may be appropriate to specify a slightly lower
+   TCP_REPLENISH_TIME to keep buffering delay to a minimum, at the risk
+   of occasionally leaving some amount of network capacity unused.
+
+   Continuing the example of the video streaming application, if a given
+   frame has a lot of movement relative to the previous frame, then the
+   video compression algorithm can be set either to encode the frame at
+   lower quality (yielding the same compressed data size) or at the same
+   quality (yielding a larger compressed data size).  In the latter
+   case, if the compressed data size is three times larger than a
+   typical compressed frame, the application can still write that larger
+   block of data.  The write is not prevented or blocked just because it
+   exceeds the desired TCP_REPLENISH_TIME budget.  After writing this
+   larger block of data kevent() (or equivalent) will not signal that it
+   is ready for more data until after the large block has drained, which
+   may take more than one typical frame time.  In this way the kevent()
+   loop has the effect of automatically reducing the frame rate to stay
+   within the available network capacity, instead of continuing to
+   generate frames faster than the network can carry them and building
+   up an increasing backlog (with a corresponding increasing delay).
+   The application may accept this reduced frame rate, or it may choose
+   to adjust its video compression algorithm to a lower quality so as to
+   increase the frame rate.  In either case, the source device buffering
+   delay is kept under control.
+
+   In all cases, it is expected that application writers will experiment
+   with different values of TCP_REPLENISH_TIME to determine empirically
+   what works best for their application.
+
+8.  Applicability
 
    This time-based backlog management is applicable anywhere that a
    queue of unsent data may build up on the sending device.
 
-7.1.  Physical Bottlenecks
+8.1.  Physical Bottlenecks
 
    A backlog may build up on the sending device if the source of the
    packets is simply generating them faster than the outgoing first-hop
@@ -577,7 +689,7 @@ Table of Contents
    mangement using L4S [RFC9330]) to the source device’s Wi-Fi
    interface, which may have very poor source buffer management.
 
-7.2.  Algorithmic Bottlenecks
+8.2.  Algorithmic Bottlenecks
 
    In addition to physical bottlenecks, there are other reasons why
    software on the sending device may choose to refrain from sending
@@ -624,7 +736,7 @@ Table of Contents
    efficient, without writing too many of them too quickly, and causing
    unwanted self-inflicted delay.
 
-7.3.  Superiority of Direct Backpressure
+8.3.  Superiority of Direct Backpressure
 
    Since multi-hop network protocols already implement indirect
    backpressure signalling in the form of discarding or marking packets,
@@ -683,7 +795,7 @@ Table of Contents
    superior, and where direct backpressure mechanisms are possible they
    should be preferred over indirect backpressure mechanisms.
 
-7.4.  Application Programming Interface
+8.4.  Application Programming Interface
 
    It is important to understand that these backpressure mechanisms at
    the API layer are not new.  By necessity, backpressure has existed
@@ -706,7 +818,7 @@ Table of Contents
    expected time budget to generate a new block of data, and everything
    else in the application remains completely unchanged.
 
-7.5.  Relationship Between Throughput and Delay
+8.5.  Relationship Between Throughput and Delay
 
    Is is important to understand that Source Buffer Management using
    TCP_REPLENISH_TIME does not alter the overall long-term average
@@ -722,7 +834,7 @@ Table of Contents
    TCP_REPLENISH_TIME the application was generating 500 kb/s with 250
    milliseconds of outgoing delay.
 
-7.6.  Bulk Transfer Protocols
+8.6.  Bulk Transfer Protocols
 
    It is frequently asserted that latency matters primarily for
    interactive applications like video conferencing and on-line games,
@@ -764,7 +876,7 @@ Table of Contents
    from the driver and hardware below to keep the network round-trip
    time low.
 
-8.  Experimental Validation
+9.  Experimental Validation
 
    The mechanisms described in this document do not exist for purely
    ideological or philosophical reasons.  Any work to improve source
@@ -785,9 +897,9 @@ Table of Contents
    mechanisms become operational to regulate the rate that data is being
    sent.
 
-9.  Alternative Proposals
+10.  Alternative Proposals
 
-9.1.  Just use UDP
+10.1.  Just use UDP
 
    Because much of the discussion about network latency involves talking
    about the behavior of transport protocols like TCP, sometimes people
@@ -815,7 +927,7 @@ Table of Contents
    delivery, and rate optimization, while avoiding unwanted delay caused
    by on-device first-hop buffering.
 
-9.2.  Packet Expiration
+10.2.  Packet Expiration
 
    One approach that is sometimes used, is to send packets tagged with
    an expiration time, and if they have spent too long waiting in the
@@ -852,7 +964,7 @@ Table of Contents
    display that frame, but also in the construction of subsequent
    frames.
 
-9.3.  Traffic Priorities / Head of Line Blocking
+10.3.  Traffic Priorities / Head of Line Blocking
 
    People are often very concerned about the problem of head-of-line-
    blocking, and propose to solve it using techniques such as packet
@@ -897,8 +1009,8 @@ Table of Contents
    in a compressed video stream where a frame is encoded as differences
    relative to the previous frame, there is no easy way to decode the
    current frame when the previous frame is missing.  This scenario has
-   many similarities to Packet Expiration (Section 9.2) except that when
-   using Packet Expiration the data loss is intentional and self-
+   many similarities to Packet Expiration (Section 10.2) except that
+   when using Packet Expiration the data loss is intentional and self-
    inflicted, whereas out-of-order delivery encompasses both the case of
    intentional packet loss by the sender and inadvertent packet loss in
    the network.
@@ -925,18 +1037,18 @@ Table of Contents
    delay buffer to allow for loss recovery equates to the same delay as
    standing five feet further away from the speakers.
 
-10.  Security Considerations
+11.  Security Considerations
 
    No security concerns are anticipated resulting from reducing the
    amount of stale data sitting in buffers at the sender.
 
-11.  IANA Considerations
+12.  IANA Considerations
 
    This document has no IANA actions.
 
-12.  References
+13.  References
 
-12.1.  Normative References
+13.1.  Normative References
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -947,7 +1059,7 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
-12.2.  Informative References
+13.2.  Informative References
 
    [Bloat1]   Gettys, J., "Whose house is of glasse, must not throw
               stones at another", December 2010,
