@@ -992,7 +992,7 @@ remains completely unchanged.
 
 ## Relationship Between Throughput and Delay
 
-Is is important to understand that Source Buffer Management
+It is important to understand that Source Buffer Management
 using TCP\_REPLENISH\_TIME does not alter the overall
 long-term average throughput of a data transfer.
 Calculating the optimum rate to send data
