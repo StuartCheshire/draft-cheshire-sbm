@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-03-25T01:06:54.904960+00:00",
+  "timestamp": "2025-03-27T01:06:26.557405+00:00",
   "repo": "StuartCheshire/draft-cheshire-sbm",
   "labels": [
     {
@@ -148,6 +148,32 @@
           "updatedAt": "2025-03-03T22:25:39Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDONZi1Cc6QGaRo",
+      "title": "fix: minor typo",
+      "url": "https://github.com/StuartCheshire/draft-cheshire-sbm/pull/4",
+      "state": "OPEN",
+      "author": "mxinden",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Thank you for this document.",
+      "createdAt": "2025-03-25T19:33:51Z",
+      "updatedAt": "2025-03-25T19:33:52Z",
+      "baseRepository": "StuartCheshire/draft-cheshire-sbm",
+      "baseRefName": "main",
+      "baseRefOid": "3d0adcd3b235e4de3c2d9915d86284d10ffcc7ab",
+      "headRepository": "mxinden/draft-cheshire-sbm",
+      "headRefName": "patch-1",
+      "headRefOid": "4d7da4b37add1855ff1923f84ab22ceca954515f",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
       "reviews": []
     }
   ]
