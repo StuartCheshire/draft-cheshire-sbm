@@ -664,9 +664,9 @@ should be expressed in terms of the application’s requirement.
 
 ## Program Structure
 
-For an application that wishes to achieve good throughput
-while also caring about the timeliness of its data,
-the recommendation is that the application use the
+For an application that wishes to achieve high throughput
+without compromising the timeliness of its data,
+this document recommends that the application use the
 “TCP\_REPLENISH\_TIME” socket option (or equivalent)
 to specify how much time it expects it will need
 to generate its next batch of data.
