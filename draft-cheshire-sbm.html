@@ -18,20 +18,20 @@ caused by excessive buffering at the sender. These improvements
 are broadly applicable across all datagram and transport
 protocols (UDP, TCP, QUIC, etc.) on all operating systems. 
     " name="description">
-<meta content="xml2rfc 3.28.0" name="generator">
+<meta content="xml2rfc 3.28.1" name="generator">
 <meta content="Bufferbloat" name="keyword">
 <meta content="Latency" name="keyword">
 <meta content="Responsiveness" name="keyword">
 <meta content="draft-cheshire-sbm-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.0
-    Python 3.12.9
+  xml2rfc 3.28.1
+    Python 3.12.10
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
-    Jinja2 3.1.5
+    Jinja2 3.1.6
     lxml 5.3.0
-    platformdirs 4.3.6
+    platformdirs 4.3.7
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.3
@@ -1840,9 +1840,9 @@ should be expressed in terms of the application’s requirement.<a href="#sectio
         <h3 id="name-program-structure">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-program-structure" class="section-name selfRef">Program Structure</a>
         </h3>
-<p id="section-7.1-1">For an application that wishes to achieve good throughput
-while also caring about the timeliness of its data,
-the recommendation is that the application use the
+<p id="section-7.1-1">For an application that wishes to achieve high throughput
+without compromising the timeliness of its data,
+this document recommends that the application use the
 “TCP_REPLENISH_TIME” socket option (or equivalent)
 to specify how much time it expects it will need
 to generate its next batch of data.<a href="#section-7.1-1" class="pilcrow">¶</a></p>

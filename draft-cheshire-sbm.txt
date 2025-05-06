@@ -556,9 +556,9 @@ Table of Contents
 
 7.1.  Program Structure
 
-   For an application that wishes to achieve good throughput while also
-   caring about the timeliness of its data, the recommendation is that
-   the application use the “TCP_REPLENISH_TIME” socket option (or
+   For an application that wishes to achieve high throughput without
+   compromising the timeliness of its data, this document recommends
+   that the application use the “TCP_REPLENISH_TIME” socket option (or
    equivalent) to specify how much time it expects it will need to
    generate its next batch of data.
 
