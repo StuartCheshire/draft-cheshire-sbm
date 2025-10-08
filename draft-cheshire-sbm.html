@@ -18,25 +18,25 @@ caused by excessive buffering at the sender. These improvements
 are broadly applicable across all datagram and transport
 protocols (UDP, TCP, QUIC, etc.) on all operating systems. 
     " name="description">
-<meta content="xml2rfc 3.28.1" name="generator">
+<meta content="xml2rfc 3.30.2" name="generator">
 <meta content="Bufferbloat" name="keyword">
 <meta content="Latency" name="keyword">
 <meta content="Responsiveness" name="keyword">
 <meta content="draft-cheshire-sbm-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.28.1
-    Python 3.12.10
+  xml2rfc 3.30.2
+    Python 3.12.11
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
-    lxml 5.3.0
-    platformdirs 4.3.7
+    lxml 5.3.1
+    platformdirs 4.4.0
     pycountry 24.6.1
     PyYAML 6.0.2
-    requests 2.32.3
-    setuptools 70.3.0
-    wcwidth 0.2.13
+    requests 2.32.5
+    setuptools 80.9.0
+    wcwidth 0.2.14
 -->
 <link href="draft-cheshire-sbm.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1495,7 +1495,7 @@ the cable modem’s choices are limited to
 enqueueing the packet,
 discarding the packet,
 or enqueueing the packet and
-marking it with an ECN CE mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.
+marking it with an ECN CE (Congestion Experienced) mark <span>[<a href="#RFC3168" class="cite xref">RFC3168</a>]</span> <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>.
 The cable modem drops or marks an incoming packet
 in the expectation that this will, eventually,
 indirectly, cause the networking code and operating system
@@ -2021,6 +2021,32 @@ from the Internet gateway
 (which may have good queue mangement using L4S <span>[<a href="#RFC9330" class="cite xref">RFC9330</a>]</span>)
 to the source device’s Wi-Fi interface,
 which may have very poor source buffer management.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<p id="section-8.1-4">Note that when the physical bottleneck is the first hop interface,
+part of (or directly attached to) the source generating
+the data stream, then the direct backpressure described here
+is the appropriate way to signal that the source should slow down.<a href="#section-8.1-4" class="pilcrow">¶</a></p>
+<p id="section-8.1-5">When the physical bottleneck is elsewhere along the path,
+it may be a local interface from the point of view of the
+device it is part of, but that device is not the original
+source of the data -- that device is merely passing through
+IP packets it received from another local interface
+(that is to say, this device is acting as a router or switch).
+In this situation the direct backpressure at the physical interface
+cannot be immediately communicated directly to the source of
+the data, because that software is running on a different device.
+In this case the direct physical backpressure is communicated
+instead to the device’s queue management algorithm,
+which determines when it becomes appropriate to express
+this local physical backpressure in the form of indirect backpressure
+(i.e., ECN Congestion marks, or dropping the packet entirely)
+that will indirectly cause the source to lower its sending rate.<a href="#section-8.1-5" class="pilcrow">¶</a></p>
+<p id="section-8.1-6">In this way a physical bottleneck on the router
+generates direct backpressure to the router’s queue management algorithm,
+which generates indirect backpressure as appropriate,
+which is manifested at the source as an algorithmic bottleneck
+(the rate optimization or “congestion control” algorithm)
+which moderates the rate that the source will inject packets into the network
+so as to match the rate the physical bottleneck can actually carry them.<a href="#section-8.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="algorithmic-bottlenecks">
@@ -2155,15 +2181,15 @@ networking APIs (or serial port APIs, or file system APIs, etc.).
 All applications have always had to be prevented from generating
 a sustained stream of data faster than the medium can consume it.
 The problem is not that backpressure mechanisms
-did not exist, but that historically these
-backpressure mechanisms were exercised far too late,
+did not exist, but that, historically, for networking APIs
+these backpressure mechanisms were exercised far too late,
 after an excessive backlog had already built up.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
 <p id="section-8.4-2">The proposal in this Source Buffer Management
 document is not to define entirely new API mechanisms
 that did not previously exist, or to fundamentally
 change how networking applications are written;
-the proposal is to use existing
-networking API mechanisms more effectively.
+the proposal is to make existing
+networking API mechanisms work more effectively.
 Depending on how a networking application is written,
 using kevent() or similar mechanisms
 to tell it when it is time to write to a socket,
@@ -2171,7 +2197,14 @@ it may be that the only change the application
 needs is a single call using TCP_REPLENISH_TIME to indicate
 its expected time budget to generate a new block
 of data, and everything else in the application
-remains completely unchanged.<a href="#section-8.4-2" class="pilcrow">¶</a></p>
+remains completely unchanged.
+Indeed, if a networking implementation were to adopt a reasonable
+default value of TCP_REPLENISH_TIME (e.g., 20 ms) that is
+broadly suitable for a wide range of applications,
+then many existing applications based on kevent() loops
+or similar mechanisms would immediately experience
+significantly lower delays, without changing a single
+line of code (or even needing to be recompiled).<a href="#section-8.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relationship-between-throughput-and-delay">
@@ -2192,9 +2225,9 @@ and the time when that data departs the sending device.
 Using the example from <a href="#casestudy" class="auto internal xref">Section 4</a>, in both cases
 the long-term average throughput was 500 kb/s.
 What changed was that originally the application was
-generating 500 kb/s with two seconds of outgoing delay;
-after using TCP_REPLENISH_TIME the application was
-generating 500 kb/s with 250 milliseconds of outgoing delay.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
+generating 500 kb/s with two whole seconds of outgoing delay;
+after using TCP_NOTSENT_LOWAT the application was
+generating 500 kb/s with just 250 milliseconds of outgoing delay.<a href="#section-8.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="bulk-transfer-protocols">
@@ -2286,7 +2319,7 @@ to regulate the rate that data is being sent.<a href="#section-9-1" class="pilcr
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-just-use-udp" class="section-name selfRef">Just use UDP</a>
         </h3>
 <p id="section-10.1-1">Because much of the discussion about network latency involves
-talking about the behavior of transport protocols like TCP,
+talking about the behavior of transport protocols like TCP and QUIC,
 sometimes people conclude that TCP is the problem,
 and think that using UDP will solve the source buffering problem.
 It does no such thing.
@@ -2319,7 +2352,7 @@ unwanted delay caused by on-device first-hop buffering.<a href="#section-10.1-3"
         <h3 id="name-packet-expiration">
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-packet-expiration" class="section-name selfRef">Packet Expiration</a>
         </h3>
-<p id="section-10.2-1">One approach that is sometimes used, is to send packets
+<p id="section-10.2-1">One approach that is sometimes used is to send packets
 tagged with an expiration time, and if they have spent
 too long waiting in the outgoing queue then they are
 automatically discarded without even being sent.
@@ -2567,7 +2600,7 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-11-1
 <dd class="break"></dd>
 <dt id="RPM">[RPM]</dt>
         <dd>
-<span class="refAuthor">Paasch, C.</span>, <span class="refAuthor">Meyer, R.</span>, <span class="refAuthor">Cheshire, S.</span>, and <span class="refAuthor">W. Hawkins</span>, <span class="refTitle">"Responsiveness under Working Conditions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ippm-responsiveness-05</span>, <time datetime="2024-10-21" class="refDate">21 October 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-05">https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-05</a>&gt;</span>. </dd>
+<span class="refAuthor">Paasch, C.</span>, <span class="refAuthor">Meyer, R.</span>, <span class="refAuthor">Cheshire, S.</span>, and <span class="refAuthor">W. Hawkins</span>, <span class="refTitle">"Responsiveness under Working Conditions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-ippm-responsiveness-07</span>, <time datetime="2025-07-07" class="refDate">7 July 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-07">https://datatracker.ietf.org/doc/html/draft-ietf-ippm-responsiveness-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TCPFR">[TCPFR]</dt>
         <dd>

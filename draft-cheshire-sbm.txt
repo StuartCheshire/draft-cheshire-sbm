@@ -278,11 +278,11 @@ Table of Contents
    the problem (the cable modem).  When an incoming packet arrives, the
    cable modem’s choices are limited to enqueueing the packet,
    discarding the packet, or enqueueing the packet and marking it with
-   an ECN CE mark [RFC3168] [RFC9330].  The cable modem drops or marks
-   an incoming packet in the expectation that this will, eventually,
-   indirectly, cause the networking code and operating system on the
-   sending device to take the necessary steps to curtail the sending
-   application.
+   an ECN CE (Congestion Experienced) mark [RFC3168] [RFC9330].  The
+   cable modem drops or marks an incoming packet in the expectation that
+   this will, eventually, indirectly, cause the networking code and
+   operating system on the sending device to take the necessary steps to
+   curtail the sending application.
 
    The reasons the cable modem’s choices are so limited are because of
    security and packet size constraints.
@@ -701,6 +701,34 @@ Table of Contents
    mangement using L4S [RFC9330]) to the source device’s Wi-Fi
    interface, which may have very poor source buffer management.
 
+   Note that when the physical bottleneck is the first hop interface,
+   part of (or directly attached to) the source generating the data
+   stream, then the direct backpressure described here is the
+   appropriate way to signal that the source should slow down.
+
+   When the physical bottleneck is elsewhere along the path, it may be a
+   local interface from the point of view of the device it is part of,
+   but that device is not the original source of the data -- that device
+   is merely passing through IP packets it received from another local
+   interface (that is to say, this device is acting as a router or
+   switch).  In this situation the direct backpressure at the physical
+   interface cannot be immediately communicated directly to the source
+   of the data, because that software is running on a different device.
+   In this case the direct physical backpressure is communicated instead
+   to the device’s queue management algorithm, which determines when it
+   becomes appropriate to express this local physical backpressure in
+   the form of indirect backpressure (i.e., ECN Congestion marks, or
+   dropping the packet entirely) that will indirectly cause the source
+   to lower its sending rate.
+
+   In this way a physical bottleneck on the router generates direct
+   backpressure to the router’s queue management algorithm, which
+   generates indirect backpressure as appropriate, which is manifested
+   at the source as an algorithmic bottleneck (the rate optimization or
+   “congestion control” algorithm) which moderates the rate that the
+   source will inject packets into the network so as to match the rate
+   the physical bottleneck can actually carry them.
+
 8.2.  Algorithmic Bottlenecks
 
    In addition to physical bottlenecks, there are other reasons why
@@ -815,20 +843,26 @@ Table of Contents
    file system APIs, etc.).  All applications have always had to be
    prevented from generating a sustained stream of data faster than the
    medium can consume it.  The problem is not that backpressure
-   mechanisms did not exist, but that historically these backpressure
-   mechanisms were exercised far too late, after an excessive backlog
-   had already built up.
+   mechanisms did not exist, but that, historically, for networking APIs
+   these backpressure mechanisms were exercised far too late, after an
+   excessive backlog had already built up.
 
    The proposal in this Source Buffer Management document is not to
    define entirely new API mechanisms that did not previously exist, or
    to fundamentally change how networking applications are written; the
-   proposal is to use existing networking API mechanisms more
+   proposal is to make existing networking API mechanisms work more
    effectively.  Depending on how a networking application is written,
    using kevent() or similar mechanisms to tell it when it is time to
    write to a socket, it may be that the only change the application
    needs is a single call using TCP_REPLENISH_TIME to indicate its
    expected time budget to generate a new block of data, and everything
-   else in the application remains completely unchanged.
+   else in the application remains completely unchanged.  Indeed, if a
+   networking implementation were to adopt a reasonable default value of
+   TCP_REPLENISH_TIME (e.g., 20 ms) that is broadly suitable for a wide
+   range of applications, then many existing applications based on
+   kevent() loops or similar mechanisms would immediately experience
+   significantly lower delays, without changing a single line of code
+   (or even needing to be recompiled).
 
 8.5.  Relationship Between Throughput and Delay
 
@@ -842,9 +876,9 @@ Table of Contents
    time when that data departs the sending device.  Using the example
    from Section 4, in both cases the long-term average throughput was
    500 kb/s.  What changed was that originally the application was
-   generating 500 kb/s with two seconds of outgoing delay; after using
-   TCP_REPLENISH_TIME the application was generating 500 kb/s with 250
-   milliseconds of outgoing delay.
+   generating 500 kb/s with two whole seconds of outgoing delay; after
+   using TCP_NOTSENT_LOWAT the application was generating 500 kb/s with
+   just 250 milliseconds of outgoing delay.
 
 8.6.  Bulk Transfer Protocols
 
@@ -914,13 +948,13 @@ Table of Contents
 10.1.  Just use UDP
 
    Because much of the discussion about network latency involves talking
-   about the behavior of transport protocols like TCP, sometimes people
-   conclude that TCP is the problem, and think that using UDP will solve
-   the source buffering problem.  It does no such thing.  If an
-   application sends UDP packets faster than the outgoing network
-   interface can carry them, then a queue of packets will still build
-   up, causing increasing delay for those packets, and eventual packet
-   loss when the queue reaches its capacity.
+   about the behavior of transport protocols like TCP and QUIC,
+   sometimes people conclude that TCP is the problem, and think that
+   using UDP will solve the source buffering problem.  It does no such
+   thing.  If an application sends UDP packets faster than the outgoing
+   network interface can carry them, then a queue of packets will still
+   build up, causing increasing delay for those packets, and eventual
+   packet loss when the queue reaches its capacity.
 
    Any protocol that runs over UDP (like QUIC [RFC9000][RFC9369]) must
    end up re-creating the same rate optimization behaviors that are
@@ -941,8 +975,8 @@ Table of Contents
 
 10.2.  Packet Expiration
 
-   One approach that is sometimes used, is to send packets tagged with
-   an expiration time, and if they have spent too long waiting in the
+   One approach that is sometimes used is to send packets tagged with an
+   expiration time, and if they have spent too long waiting in the
    outgoing queue then they are automatically discarded without even
    being sent.  This is counterproductive because the sending
    application does all the work to generate data, and then has to do
@@ -1166,9 +1200,8 @@ Table of Contents
    [RPM]      Paasch, C., Meyer, R., Cheshire, S., and W. Hawkins,
               "Responsiveness under Working Conditions", Work in
               Progress, Internet-Draft, draft-ietf-ippm-responsiveness-
-              05, 21 October 2024,
-              <https://datatracker.ietf.org/doc/html/draft-ietf-ippm-
-              responsiveness-05>.
+              07, 7 July 2025, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-ippm-responsiveness-07>.
 
    [TCPFR]    Cheshire, S., "Ruckus WiFi Evaluation", April 2006,
               <http://stuartcheshire.org/papers/Ruckus-WiFi-
