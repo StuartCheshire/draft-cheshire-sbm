@@ -6,7 +6,7 @@ category: info
 docname: draft-cheshire-sbm-latest
 submissiontype: independent
 number:
-date: 2025-03-16
+date: 2025-10-20
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
