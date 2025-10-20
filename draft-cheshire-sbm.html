@@ -18,24 +18,23 @@ caused by excessive buffering at the sender. These improvements
 are broadly applicable across all datagram and transport
 protocols (UDP, TCP, QUIC, etc.) on all operating systems. 
     " name="description">
-<meta content="xml2rfc 3.30.2" name="generator">
+<meta content="xml2rfc 3.31.0" name="generator">
 <meta content="Bufferbloat" name="keyword">
 <meta content="Latency" name="keyword">
 <meta content="Responsiveness" name="keyword">
 <meta content="draft-cheshire-sbm-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.30.2
-    Python 3.12.11
+  xml2rfc 3.31.0
+    Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.6
     lxml 5.3.1
-    platformdirs 4.4.0
+    platformdirs 4.5.0
     pycountry 24.6.1
     PyYAML 6.0.2
     requests 2.32.5
-    setuptools 80.9.0
     wcwidth 0.2.14
 -->
 <link href="draft-cheshire-sbm.xml" rel="alternate" type="application/rfc+xml">
@@ -1245,7 +1244,7 @@ protocols (UDP, TCP, QUIC, etc.) on all operating systems.<a href="#section-abst
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-alternative-proposals" class="internal xref">Alternative Proposals</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
-                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-just-use-udp" class="internal xref">Just use UDP</a></p>
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-just-use-raw-udp" class="internal xref">Just use “Raw UDP”</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
                 <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-packet-expiration" class="internal xref">Packet Expiration</a></p>
@@ -2313,22 +2312,22 @@ to regulate the rate that data is being sent.<a href="#section-9-1" class="pilcr
       <h2 id="name-alternative-proposals">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-alternative-proposals" class="section-name selfRef">Alternative Proposals</a>
       </h2>
-<div id="just-use-udp">
+<div id="just-use-raw-udp">
 <section id="section-10.1">
-        <h3 id="name-just-use-udp">
-<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-just-use-udp" class="section-name selfRef">Just use UDP</a>
+        <h3 id="name-just-use-raw-udp">
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-just-use-raw-udp" class="section-name selfRef">Just use “Raw UDP”</a>
         </h3>
 <p id="section-10.1-1">Because much of the discussion about network latency involves
 talking about the behavior of transport protocols like TCP and QUIC,
-sometimes people conclude that TCP is the problem,
-and think that using UDP will solve the source buffering problem.
+sometimes people conclude that TCP and QUIC are the problem,
+and they may imagine that directly using raw UDP packets
+will magically solve the source buffering problem.
 It does no such thing.
-If an application sends UDP packets faster than the outgoing
+If an application sends raw UDP packets faster than the outgoing
 network interface can carry them, then a queue of packets
 will still build up, causing increasing delay for those packets,
 and eventual packet loss when the queue reaches its capacity.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
-<p id="section-10.1-2">Any protocol that runs over UDP
-(like QUIC <span>[<a href="#RFC9000" class="cite xref">RFC9000</a>]</span><span>[<a href="#RFC9369" class="cite xref">RFC9369</a>]</span>) must end up
+<p id="section-10.1-2">Any protocol that runs over UDP (like QUIC) must end up
 re-creating the same rate optimization behaviors that
 are already built into TCP, or it will fail to operate
 gracefully over a range of different network conditions.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
@@ -2337,11 +2336,18 @@ reliability, in-order delivery, and rate optimization,
 because the UDP header has no sequence number or similar
 fields that would make these capabilities possible.
 However, networking APIs for UDP <span class="bcp14">SHOULD</span> provide appropriate
-backpressure to the client software, so that software
-using UDP can avoid unnecessary self-inflicted
-delays when inadvertently attempting to send faster
-than the outgoing first-hop interface can carry it.
-This backpressure allows advanced protocols
+first-hop (direct) backpressure to the client software,
+so that software using UDP can avoid unnecessary self-inflicted
+delays when inadvertently attempting to send faster than
+the outgoing first-hop interface can carry it.
+Additionally, networking APIs for UDP <span class="bcp14">SHOULD</span> provide the
+ability to read and write the ECN field of the IP header,
+so that software using UDP can avoid unnecessary self-inflicted
+delays when inadvertently attempting to send faster than
+subsequent hops on the path can carry it <span>[<a href="#UDPECN" class="cite xref">UDPECN</a>]</span>.
+These backpressure mechanisms
+(both first-hop direct backpressure and ECN-based indirect backpressure)
+allow advanced protocols
 like QUIC to provide capabilities like reliability,
 in-order delivery, and rate optimization, while avoiding
 unwanted delay caused by on-device first-hop buffering.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
@@ -2607,8 +2613,12 @@ the amount of stale data sitting in buffers at the sender.<a href="#section-11-1
 <span class="refAuthor">Cheshire, S.</span>, <span class="refTitle">"Ruckus WiFi Evaluation"</span>, <time datetime="2006-04" class="refDate">April 2006</time>, <span>&lt;<a href="http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf">http://stuartcheshire.org/papers/Ruckus-WiFi-Evaluation.pdf</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="THJ">[THJ]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Toke Høiland-Jørgensen</span>, <span class="refTitle">"The State of the Art in Bufferbloat Testing and Reduction on Linux"</span>, <time datetime="2013-03" class="refDate">March 2013</time>, <span>&lt;<a href="https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf">https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="UDPECN">[UDPECN]</dt>
+      <dd>
+<span class="refAuthor">Duke, M.</span>, <span class="refTitle">"Configuring UDP Sockets for ECN for Common Platforms"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-tsvwg-udp-ecn-04</span>, <time datetime="2025-10-20" class="refDate">20 October 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-udp-ecn-04">https://datatracker.ietf.org/doc/html/draft-ietf-tsvwg-udp-ecn-04</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
