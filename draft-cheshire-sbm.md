@@ -113,6 +113,7 @@ informative:
     title: "The State of the Art in Bufferbloat Testing and Reduction on Linux"
     date: March 2013
     target: https://www.ietf.org/proceedings/86/slides/slides-86-iccrg-0.pdf
+  UDPECN: I-D.ietf-tsvwg-udp-ecn
 
 --- abstract
 
@@ -1119,20 +1120,20 @@ to regulate the rate that data is being sent.
 
 # Alternative Proposals
 
-## Just use UDP
+## Just use “Raw UDP”
 
 Because much of the discussion about network latency involves
 talking about the behavior of transport protocols like TCP and QUIC,
-sometimes people conclude that TCP is the problem,
-and think that using UDP will solve the source buffering problem.
+sometimes people conclude that TCP and QUIC are the problem,
+and they may imagine that directly using raw UDP packets
+will magically solve the source buffering problem.
 It does no such thing.
-If an application sends UDP packets faster than the outgoing
+If an application sends raw UDP packets faster than the outgoing
 network interface can carry them, then a queue of packets
 will still build up, causing increasing delay for those packets,
 and eventual packet loss when the queue reaches its capacity.
 
-Any protocol that runs over UDP
-(like QUIC {{RFC9000}}{{RFC9369}}) must end up
+Any protocol that runs over UDP (like QUIC) must end up
 re-creating the same rate optimization behaviors that
 are already built into TCP, or it will fail to operate
 gracefully over a range of different network conditions.
@@ -1142,11 +1143,18 @@ reliability, in-order delivery, and rate optimization,
 because the UDP header has no sequence number or similar
 fields that would make these capabilities possible.
 However, networking APIs for UDP SHOULD provide appropriate
-backpressure to the client software, so that software
-using UDP can avoid unnecessary self-inflicted
-delays when inadvertently attempting to send faster
-than the outgoing first-hop interface can carry it.
-This backpressure allows advanced protocols
+first-hop (direct) backpressure to the client software,
+so that software using UDP can avoid unnecessary self-inflicted
+delays when inadvertently attempting to send faster than
+the outgoing first-hop interface can carry it.
+Additionally, networking APIs for UDP SHOULD provide the
+ability to read and write the ECN field of the IP header,
+so that software using UDP can avoid unnecessary self-inflicted
+delays when inadvertently attempting to send faster than
+subsequent hops on the path can carry it {{UDPECN}}.
+These backpressure mechanisms
+(both first-hop direct backpressure and ECN-based indirect backpressure)
+allow advanced protocols
 like QUIC to provide capabilities like reliability,
 in-order delivery, and rate optimization, while avoiding
 unwanted delay caused by on-device first-hop buffering.
