@@ -1,15 +1,22 @@
-LIBDIR := lib
-include $(LIBDIR)/main.mk
+xml2rfc ?= xml2rfc
+kramdown-rfc2629 ?= kramdown-rfc2629
 
-$(LIBDIR)/main.mk:
-ifneq (,$(shell grep "path *= *$(LIBDIR)" .gitmodules 2>/dev/null))
-	git submodule sync
-	git submodule update --init
-else
-ifneq (,$(wildcard $(ID_TEMPLATE_HOME)))
-	ln -s "$(ID_TEMPLATE_HOME)" $(LIBDIR)
-else
-	git clone -q --depth 10 -b main \
-	    https://github.com/martinthomson/i-d-template $(LIBDIR)
-endif
-endif
+drafts := draft-cheshire-sbm.xml draft-cheshire-sbm.txt draft-cheshire-sbm.html
+
+all: $(drafts)
+
+%.xml: %.md
+	@echo "Converting MD to XML"
+	$(kramdown-rfc2629) $< > $@
+
+%.txt: %.xml
+	@echo "Converting XML to TXT"
+	$(xml2rfc) $< > $@
+
+%.html: %.xml
+	@echo "Converting XML to HTML"
+	$(xml2rfc) --html $<  > $@
+
+clean:
+	@echo "Cleaning"
+	rm -rf $(drafts)
