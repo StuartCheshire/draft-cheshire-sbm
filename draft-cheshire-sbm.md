@@ -6,7 +6,7 @@ category: info
 docname: draft-cheshire-sbm-latest
 submissiontype: independent
 number:
-date: 2025-10-20
+date: 2026-07-06
 v: 3
 # area: WIT
 # workgroup: TSVWG Transport and Services Working Group
@@ -141,7 +141,7 @@ of how excessive buffering in networks adversely affects
 delay-sensitive applications {{Bloat1}}{{Bloat2}}{{Bloat3}}.
 This important work identifying a non-obvious problem
 has led to valuable developments to improve this situation,
-like fq_codel {{RFC8290}}, PIE {{RFC8033}}, Cake {{Cake}}
+like fq_codel {{RFC8290}}, PIE {{RFC8033}}, Cake {{Cake}},
 and L4S {{RFC9330}}.
 
 However, excessive buffering at the source
@@ -229,8 +229,8 @@ Some systems allowed a single asynchronous write
 to the spinning hard disk to proceed while
 the application software performed other processing.
 Other systems allowed multiple asynchronous writes to be enqueued,
-but even these systems generally imposed some upper bound on
-the amount of outstanding incomplete writes they would support.
+but even these systems did not permit an unbounded backlog
+of data waiting to be written disk.
 At some point, if the application software persisted in
 trying to write data faster than the medium could accept it,
 then the application would be throttled in some way,
@@ -242,7 +242,7 @@ or by returning a Unix EWOULDBLOCK error or similar
 been unsuccessful, and that it would need to take
 action to write its data again at a later time).
 
-It is informative to observe a comparison with graphics cards.
+It is instructive to observe a comparison with graphics cards.
 Most graphics cards support double-buffering.
 This allows one frame to be displayed while
 the CPU and GPU are working on generating the next frame.
@@ -272,14 +272,14 @@ buffer and discard all the data, but mechanisms to
 selectively remove or re-order enqueued data
 are complicated and rare.
 While it could be possible to add such mechanisms,
-on balance it is simpler simply to avoid committing
+on balance it is simpler just to avoid committing
 too much unsent data to the buffer in the first place.
 If the backlog of unsent data is kept reasonably low,
-that gives the source more flexibility decide what to
+that gives the source more flexibility to decide what to
 put into the buffer next, when that opportunity arises.
 
 In summary, in order to give applications maximum
-flexibility, pending data should be kept as close
+flexibility, pending data should be kept close
 to the application for as long as possible.
 Application buffers should be as large as needed
 for the application to do its work,
@@ -306,7 +306,7 @@ For example, consider the case of
 a smartphone communicating via a Wi-Fi Access Point at 600 Mb/s,
 which is connected to a home NAT gateway via gigabit Ethernet,
 which is connected to a cable modem via gigabit Ethernet,
-which has an upstream output rate of 35Mb/s over the coaxial cable.
+which has an upstream output rate of 35 Mb/s over the coaxial cable.
 
 ~~~~
   -----   600            1              1             35
@@ -343,8 +343,8 @@ indirectly, cause the networking code and operating system
 on the sending device to take the necessary steps
 to curtail the sending application.
 
-The reasons the cable modem’s choices are so limited
-are because of security and packet size constraints.
+The cable modem’s choices are so limited
+because of security and packet size constraints.
 
 Security and trust concerns revolve around preventing a
 malicious entity from performing a denial-of-service attack
@@ -353,14 +353,14 @@ would cause the victim to reduce its transmission rate.
 It is particularly important to guard against an off-path attacker
 being able to do this. This concern is addressed if queue size
 feedback generated in the network follows the same path already
-taken by the data packets and their subsequent acknowledgement
+taken by the data packets and their subsequent acknowledgment
 packets. The logic is that any on-path device that is able to
 modify data packets (changing the ECN bits in the IP header)
 could equally well corrupt packets or discard them entirely.
 Thus, trusting ECN information from these devices does not
 increase security concerns, since these devices could already
 perform more damaging actions anyway. The sender already
-trusts the receiver to generate accurate acknowledgement
+trusts the receiver to generate accurate acknowledgment
 packets, so also trusting it to report ECN information back
 to the sender does not increase the security risk.
 
@@ -442,7 +442,7 @@ plus some **small** amount of additional unsent data waiting to go out.
 Some **small** amount of unsent data waiting to go out is
 beneficial, so that the network stack has data
 ready to send when the opportunity arises
-(e.g., a TCP ACK arrives signalling
+(e.g., a TCP ACK arrives signaling
 that previous data has now been delivered).
 Too much unsent data waiting to go out
 -- in excess of what the network stack
@@ -485,12 +485,12 @@ later operational experience has revealed some shortcomings.
 ## Platform Differences
 
 The Linux network maintainers implemented a TCP
-socket option with the same name, but different behavior.
+socket option with the same name but different behavior.
 While the Apple version of TCP\_NOTSENT\_LOWAT was
-focussed on reducing delay,
-the Linux version was focussed on reducing kernel memory usage.
+focused on reducing delay,
+the Linux version was focused on reducing kernel memory usage.
 The Apple version of TCP\_NOTSENT\_LOWAT controls
-a low-water mark, below which the application is signalled
+a low-water mark, below which the application is signaled
 that it is time to begin working on generating fresh data.
 The Linux version determines a high-water mark for unsent data,
 above which the application is **prevented** from writing any more,
@@ -502,7 +502,7 @@ to write portable code that works on both platforms.
 
 ## Time versus Bytes
 
-The original thinking on TCP\_NOTSENT\_LOWAT focussed on
+The original thinking on TCP\_NOTSENT\_LOWAT focused on
 the number of unsent bytes remaining, but it soon became
 clear that the relevant quantity was time, not bytes.
 The quantity of interest to the sending application
@@ -519,7 +519,7 @@ insufficient time to generate its next logical block of data
 before the unsent backlog ran out
 and available network capacity was left unused.
 It became clear that it would be more useful for the
-sending application specify how much advance notice
+sending application to specify how much advance notice
 of data exhaustion it required (in milliseconds, or microseconds),
 depending on how much time the application anticipated
 needing to generate its next logical block of data.
@@ -557,7 +557,7 @@ If stretch acks are being used, then each ack packet
 could acknowledge 8 data segments, or about 12 kilobytes.
 If one such ack packet is lost, the following ack packet
 will cumulatively acknowledge 24 kilobytes,
-instantly consuming the entire 16 kilobyte unsent backlog,
+instantly consuming the entire 16-kilobyte unsent backlog,
 and giving the application no advance notice that
 the transport protocol is suddenly out of available data to send,
 and some network capacity becomes wasted.
@@ -609,7 +609,7 @@ The time-based estimate does not need to be perfectly accurate,
 either on the part of the transport protocol estimating how much
 time remains before the backlog of unsent data is exhausted,
 or on the part of the application estimating how much
-time it will need generate its next logical block of data.
+time it will need to generate its next logical block of data.
 If the network data rate increases significantly, or a group of
 delayed acknowledgments all arrive together, then the transport
 protocol could end up discovering that it has overestimated how
@@ -696,13 +696,13 @@ The presence of the kevent() signal tells the application
 that this is a good time to generate new data;
 the absence of the kevent() signal is **not**
 a **prohibition** on the application writing more data.
-Even if kevent() is not signalling impending exhaustion
+Even if kevent() is not signaling impending exhaustion
 of the data buffer, an application is still free to write
 as much data as is appropriate for that application
 (potentially limited by some other parameter,
 such as the SO_SNDBUF size in BSD Sockets).
 
-Note that there is precendent for this
+Note that there is precedent for this
 kind of behavior in current programming APIs.
 For example, if a TCP connection on Linux
 has a socket send buffer of 1000 kilobytes,
@@ -734,10 +734,10 @@ depends on the application’s needs.
 
 For example, a screen sharing server (or a video streaming source)
 sending data at 60 frames per second may require 17 milliseconds
-between when it grabs the frame from the screen (or camera),
-compresses it, and has the data ready for transmission.
+to grab the frame from the screen (or camera), compress it,
+and have the data ready for transmission.
 Such an application might specify a TCP\_REPLENISH\_TIME
-of 20 milliseconds, so give reasonable confidence that
+of 20 milliseconds, to give reasonable confidence that
 it will have the next frame prepared and ready before
 the transport protocol finishes sending the previous frame.
 If the video capture process is more pipelined,
@@ -819,7 +819,7 @@ We refer to this case as a physical bottleneck.
 
 For an example of a physical bottleneck,
 consider the case where a user has symmetric
-1Gb/s Internet service,
+1 Gb/s Internet service,
 and they are sending data from a device
 communicating via Wi-Fi at a lower rate, say 300 Mb/s.
 In this case (assuming the device is communicating
@@ -827,7 +827,7 @@ with a well-connected server on the Internet)
 the limiting factor of the entire path is
 the first hop -- the sending device’s Wi-Fi interface.
 If the device’s Wi-Fi hardware, driver, and networking software
-does not produce appropriate backpressure, then outgoing
+do not produce appropriate backpressure, then outgoing
 network traffic will experience increasing delays.
 The Linux Byte Queue Limits mechanism {{Hruby}}{{THJ}}{{Herbert}}
 is one example of a technique to tune hardware buffers
@@ -837,16 +837,16 @@ so large that they unnecessarily increase delay.
 
 Poor backpressure from first-hop physical bottlenecks
 can produce the ironic outcome that upgrading
-home Internet service from 100Mb/s to 1Gb/s can sometimes
+home Internet service from 100 Mb/s to 1 Gb/s can sometimes
 result in a customer getting a worse user experience,
 because the service upgrade
 causes the bottleneck hop to change location,
 from the Internet gateway
-(which may have good queue mangement using L4S {{RFC9330}})
+(which may have good queue management using L4S {{RFC9330}})
 to the source device’s Wi-Fi interface,
 which may have very poor source buffer management.
 
-Note that when the physical bottleneck is the first hop interface,
+Note that when the physical bottleneck is the first-hop interface,
 part of (or directly attached to) the source generating
 the data stream, then the direct backpressure described here
 is the appropriate way to signal that the source should slow down.
@@ -872,7 +872,7 @@ generates direct backpressure to the router’s queue management algorithm,
 which generates indirect backpressure as appropriate,
 which is manifested at the source as an algorithmic bottleneck
 (the rate optimization or “congestion control” algorithm)
-which moderates the rate that the source will inject packets into the network
+which moderates the rate at which the source will inject packets into the network
 so as to match the rate the physical bottleneck can actually carry them.
 
 ## Algorithmic Bottlenecks
@@ -901,7 +901,7 @@ not to overflow a queue at some other bottleneck within the network.
 This is vital to avoid overrunning the capacity of the bottleneck
 network hop with data faster than it can forward it,
 resulting in massive packet loss,
-which would equate to a large wastage of resources at the sender,
+which would equate to a large waste of resources at the sender,
 in the form of battery power and network capacity wasted by
 generating packets that will not make it to the receiver.
 
@@ -910,9 +910,8 @@ implementation may choose voluntarily to moderate the rate at
 which it emits packets, so as to smooth the flow of packets into
 the network, even though the device’s outgoing first-hop interface
 might be easily capable of sending at a much higher rate.
-When packet pacing is being used, a temporary backlog
-can build up at this layer if the source is generating
-data faster than the pacing rate.
+A temporary backlog can build up at this layer if the source
+is generating data faster than the pacing rate.
 
 Whether the source application is constrained
 by a physical bottleneck on the sending device, or
@@ -929,11 +928,11 @@ and causing unwanted self-inflicted delay.
 ## Superiority of Direct Backpressure
 
 Since multi-hop network protocols already implement
-indirect backpressure signalling
+indirect backpressure signaling
 in the form of discarding or marking packets,
 it can be tempting to use the same mechanism
 to generate backpressure for first-hop physical bottlenecks.
-Superficially there might seem to be some attractive
+Superficially, there might seem to be some attractive
 elegance in having the first hop use the same drop/mark
 mechanism as the remaining hops on the path.
 However, this is not an ideal solution because indirect
@@ -959,7 +958,7 @@ designers of networking software have more freedom about how to manage this.
 the same physical device, network security and trust concerns do not apply.
 
 (ii) When the mechanism we use to communicate about queue state
-is a software API instead of packets sent though a network,
+is a software API instead of packets sent through a network,
 we do not have the constraint of having to work within
 limited IP packet header space.
 
@@ -974,22 +973,22 @@ learn what is already known on the sending device),
 so it is worthwhile optimizing for this common case.
 
 Direct backpressure can be achieved
-simply making an API call block,
+simply by making an API call block,
 or by returning a Unix EWOULDBLOCK error,
-or using equivalent mechanisms in other APIs,
+or by using equivalent mechanisms in other APIs,
 and has the effect of immediately halting the flow of new data.
 Similarly, when the system becomes able to accept more data,
-unblocking an API call, indicating that a socket
-has become writable using select() or kevent(),
-or equivalent mechanisms in other APIs,
-has the effect of immediately allowing the production of more data.
+immediately allowing the production of more data is achieved
+by unblocking an API call,
+by indicating that a socket has become writable using select() or kevent(),
+or by using equivalent mechanisms in other APIs.
 
-Indirect backpressure is vastly inferior to direct backpressure.
+Direct backpressure, when available,
+is vastly superior to indirect backpressure.
 For rate adjustment signals generated within the network,
 indirect backpressure has to be used because
 in that situation better alternatives are not available.
-Direct backpressure is vastly superior,
-and where direct backpressure mechanisms are possible they
+Where direct backpressure mechanisms are possible they
 should be preferred over indirect backpressure mechanisms.
 
 ## Application Programming Interface
@@ -1029,11 +1028,11 @@ line of code (or even needing to be recompiled).
 
 ## Relationship Between Throughput and Delay
 
-Is is important to understand that Source Buffer Management
+It is important to understand that Source Buffer Management
 using TCP\_REPLENISH\_TIME does not alter the overall
 long-term average throughput of a data transfer.
 Calculating the optimum rate to send data
-(so as not to exceed receiver’s capacity,
+(so as not to exceed the receiver’s capacity,
 or the available network capacity)
 remains the responsibility of the transport protocol.
 Using TCP\_REPLENISH\_TIME does not alter the data rate;
@@ -1062,9 +1061,10 @@ For example, TCP Fast Retransmit {{RFC5681}} can immediately
 recover a single lost packet in a single round-trip time.
 TCP generally performs at its absolute best when the
 loss rate is no more than one loss per round-trip time.
-More than one loss per round-trip time requires more
-extensive use of TCP SACK blocks, which consume extra
-space in the packet header, and makes the work of the
+More than one loss per round-trip time requires
+more extensive use of TCP SACK blocks
+(which consume extra space in the packet header)
+and makes the work of the
 rate management (congestion control) algorithm harder.
 This can result in the transport protocol temporarily
 sending too fast, resulting in additional packet loss,
@@ -1081,10 +1081,10 @@ network round-trip time, so the higher the total network
 round-trip time is, the less agile the transport protocol
 is at adjusting to varying network conditions.
 
-In short, a client running over a transport protocol like TCP
-may itself not be a real-time delay-sensitive application,
-but a transport protocol itself is most definitely a
-delay-sensitive application, responding in real time
+In short, a client running over a transport protocol
+like TCP may not be a delay-sensitive application itself,
+but the transport protocol is most definitely
+delay-sensitive software, responding in real time
 to changing network conditions.
 The application doing the large bulk data transfer
 may have no need to use TCP\_REPLENISH\_TIME
@@ -1113,7 +1113,7 @@ when a nontrivial amount of data is being sent and
 the buffer is no longer empty.
 The quality of the source buffer management policy
 and the effectiveness of its backpressure mechanisms
-only become apparent when a source of the data is
+only become apparent when the source of the data is
 willing and able to exceed the available network capacity,
 and the backpressure mechanisms become operational
 to regulate the rate that data is being sent.
@@ -1199,23 +1199,23 @@ frequently much higher than the cost would have been
 to simply send the delayed frame.
 Just because a frame arrives too late to be displayed does
 not mean that the data within that frame is not important.
-The data contained with a frame is used not only to display
+The data contained within a frame is used not only to display
 that frame, but also in the construction of subsequent frames.
 
 ## Traffic Priorities / Head of Line Blocking
 
 People are often very concerned about the problem of
-head-of-line-blocking, and propose to solve it using
+head-of-line blocking, and propose to solve it using
 techniques such as packet priorities,
-the ability cancel unsent pending messages {{MMADAPT}},
+the ability to cancel unsent pending messages {{MMADAPT}},
 and out-of-order delivery on the receiving side.
-There is an unconscious unstated assumption baked into
+There is an unconscious, unstated assumption baked into
 this line of reasoning, which is that having an excessively
 long outgoing queue is inevitable and unavoidable, and therefore
-we have to devote a lot of our energy into how to organize
+we have to devote a lot of our energy working out how to organize
 and prioritize and manage that obligatory excessive queue.
 In contrast, if we take steps to keep queues short,
-the problems of head-of-line-blocking largely go away.
+the problems of head-of-line blocking largely solve themselves.
 When the line is consistently short, being at the back of
 the line is no longer the serious problem that it used to be.
 
@@ -1246,7 +1246,7 @@ but two network round-trip times would be unacceptable.
 This is the scenario where out-of-order delivery
 on the receiving side appears attractive.
 However, writing application code to take advantage of
-out-of-order delivery has proven to be surprising difficult.
+out-of-order delivery has proven to be surprisingly difficult.
 Many modern data types are not amenable to easy interpretation
 when parts of the data are missing.
 In compressed data, such as ZIP files, JPEG images,
@@ -1264,7 +1264,7 @@ intentional and self-inflicted, whereas out-of-order delivery
 encompasses both the case of intentional packet loss by
 the sender and inadvertent packet loss in the network.
 
-In a network using L4S {{RFC9330}} the motivation
+In a network using L4S {{RFC9330}}, the motivation
 for writing extremely complicated software to handle
 out-of-order delivery (i.e., data with gaps) is weak,
 especially when L4S makes actual packet loss exceedingly rare,
@@ -1277,7 +1277,7 @@ where one network round-trip time is acceptable
 but two network round-trip times would be unacceptable
 only applies when the network round-trip time is large
 relative to the user-experience requirements of the application.
-For example, for distributing real-time audio within a home network,
+For example, for distributing low-latency audio within a home network,
 where round-trip delays over the local Ethernet or Wi-Fi network
 are just a few milliseconds, simply relying on Fast Retransmit to recover
 occasional lost packets within a few milliseconds {{TCPFR}}
