@@ -191,6 +191,46 @@ solutions that are often proposed, and explains
 why we feel they are less effective than simply
 implementing effective source buffer management.
 
+## IETF Relevance
+
+Generally, the IETF concerns itself with design issues
+like packet formats and protocol timing parameters
+(i.e., properties that you can observe externally using tools like Wireshark).
+The work described in this document does not alter
+packet header formats, or define new protocol options.
+Instead it concentrates on implementation details and API properties,
+subjects usually on the fringe of IETF discussion when they do not
+affect the on-the-wire protocol.
+
+In this case, implementation and API characteristics are relevant to the IETF.
+The delay between the time when an application writes some data
+and when that data is sent in a packet on the network is,
+in principle, an externally observable property.
+Furthermore,
+the problem of excessive buffering at the sender is very widespread,
+across all common transport protocols and all major operating systems.
+Given the pervasiveness of the Source Buffer Management problem,
+it is worthwhile to have a holistic approach to solving it consistently
+in all scenarios, rather than creating solutions piecemeal,
+having a different ad hoc solution for each transport protocol
+on each operating system.
+
+Finally, there is the potential that additional work may
+need to be done to ensure that congestion control algorithms
+interact well with direct backpressure.
+Normally, the congestion control algorithm is responsible for
+controlling the rate at which packets are sent into the network.
+When combined with direct backpressure,
+there are now two mechanisms jointly responsible for
+controlling the rate at which packets are sent into the network.
+When direct backpressure is used to inform the
+congestion control algorithm about how fast it should be
+generating packets, care needs to be taken so
+that when the local network conditions change
+(e.g., varying contention for Wi-Fi spectrum, or varying Wi-Fi MCS rates)
+and direct backpressure lifts, the congestion control algorithm does
+not suddenly release an excessive burst of traffic into the network.
+
 # Source Buffer Backpressure
 
 Starting with the most basic principles,
